@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>BuilderSelect — Sign In</title>
+<title>Todd Homes LLC — Sign In</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -297,6 +297,22 @@ body::after {
   .card-body { padding: 24px 24px 28px; }
   .brand-logo { font-size: 2.4rem; }
 }
+
+.brand-logo-img {
+  height: 64px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 8px;
+}
+.brand-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  color: var(--white);
+  letter-spacing: 3px;
+  line-height: 1;
+}
+.brand-name span { color: var(--red); }
 </style>
 </head>
 <body>
@@ -304,7 +320,8 @@ body::after {
 <!-- LOGIN CARD -->
 <div class="card" id="loginCard">
   <div class="card-header">
-    <div class="brand-logo">Builder<span>Select</span></div>
+    <img src="https://selectionsbuilderandrewcoleman.netlify.app/Toddlogo.png" alt="Todd Homes LLC" class="brand-logo-img" onerror="this.style.display='none'"/>
+    <div class="brand-name">Todd <span>Homes</span> LLC</div>
     <div class="brand-sub">Selection Management System</div>
   </div>
   <div class="card-body">
@@ -329,7 +346,8 @@ body::after {
 <!-- LOGGED IN CARD -->
 <div class="card logged-in-card" id="loggedInCard">
   <div class="card-header">
-    <div class="brand-logo">Builder<span>Select</span></div>
+    <img src="https://selectionsbuilderandrewcoleman.netlify.app/Toddlogo.png" alt="Todd Homes LLC" class="brand-logo-img" onerror="this.style.display='none'"/>
+    <div class="brand-name">Todd <span>Homes</span> LLC</div>
     <div class="brand-sub">Selection Management System</div>
   </div>
   <div class="card-body">

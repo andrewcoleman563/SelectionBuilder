@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>BuilderSelect — Selection Page</title>
+<title>Todd Homes LLC — Selections</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -179,20 +179,96 @@ body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: 
   .hdr-user { display: none; }
 }
 @media (min-width: 861px) { .mob-nav { display: none !important; } }
+
+.hdr-logo-img { height: 36px; width: auto; object-fit: contain; }
+
+/* Import button in info bar */
+.btn-import {
+  background: var(--black); color: var(--white);
+  border: none; border-radius: 3px;
+  font-family: 'DM Sans', sans-serif; font-size: .72rem; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase;
+  padding: 6px 12px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: background .14s;
+}
+.btn-import:hover { background: var(--red); }
+
+/* Save button in bottom bar */
+.btn-save {
+  background: var(--green); color: var(--white);
+  border: none; border-radius: 3px;
+  font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase;
+  padding: 0 14px; height: 36px; cursor: pointer; white-space: nowrap;
+  transition: background .14s;
+}
+.btn-save:hover { background: #145f30; }
+
+/* ── MODALS ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  z-index: 600; display: none; align-items: center; justify-content: center; padding: 16px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--white); border-top: 3px solid var(--red);
+  border-radius: 3px; padding: 24px; width: 100%; max-width: 860px;
+  max-height: 88vh; display: flex; flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0,0,0,.18);
+}
+.modal-box.narrow { max-width: 420px; }
+.modal-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 2px; color: var(--black); }
+.modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--muted); padding: 4px 8px; border-radius: 3px; }
+.modal-close:hover { background: var(--off-white); color: var(--red); }
+
+/* Import table */
+.filter-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.filter-input {
+  flex: 1; min-width: 120px;
+  background: var(--off-white); border: 1.5px solid var(--border);
+  border-radius: 3px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: .8rem;
+  padding: 7px 10px;
+}
+.filter-input:focus { outline: none; border-color: var(--red); }
+.sel-table-wrap { overflow-y: auto; flex: 1; border: 1px solid var(--border); border-radius: 3px; }
+.sel-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.sel-table thead { background: var(--black); position: sticky; top: 0; z-index: 1; }
+.sel-table thead th { color: var(--white); font-size: .6rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 10px 12px; text-align: left; white-space: nowrap; }
+.sel-table thead th:first-child { border-left: 3px solid var(--red); }
+.sel-table tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background .1s; }
+.sel-table tbody tr:hover { background: var(--red-light); }
+.sel-table tbody td { padding: 9px 12px; color: var(--text); }
+.sel-table tbody tr.selected-row { background: var(--red-light); border-left: 3px solid var(--red); }
+.import-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+.btn-modal { border: none; border-radius: 3px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .76rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 8px 16px; transition: all .14s; }
+.btn-modal-red { background: var(--red); color: var(--white); }
+.btn-modal-red:hover { background: var(--red-dark); }
+.btn-modal-outline { background: transparent; border: 1.5px solid var(--border2); color: var(--text); }
+.btn-modal-outline:hover { border-color: var(--red); color: var(--red); }
+.empty-state { padding: 40px; text-align: center; color: var(--muted); font-size: .85rem; }
+
+/* Toast */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--black); color: var(--white); border-left: 4px solid var(--red); border-radius: 3px; padding: 10px 16px; font-size: .8rem; z-index: 999; opacity: 0; transform: translateY(8px); transition: all .25s; pointer-events: none; max-width: 300px; }
+.toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
 <div id="authGate">
-  <div class="gate-logo">Builder<span>Select</span></div>
+  <div class="gate-logo">Todd <span>Homes</span></div>
   <div class="spinner"></div>
   <div class="gate-msg">Verifying access…</div>
 </div>
 
 <div class="header">
-  <div>
-    <div class="logo">Selection <span>Page</span></div>
-    <div class="logo-sub">Customer Selections Meeting</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <img src="https://selectionsbuilderandrewcoleman.netlify.app/Toddlogo.png" alt="Todd Homes LLC" class="hdr-logo-img" onerror="this.style.display='none'"/>
+    <div>
+      <div class="logo">Selection <span>Page</span></div>
+      <div class="logo-sub">Todd Homes LLC · Customer Selections</div>
+    </div>
   </div>
   <div class="hdr-mid">
     <div class="hdr-pkg-label">Active Package</div>
@@ -214,8 +290,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: 
   <div class="idivider"></div>
   <div class="ifield"><span class="ilabel">Lot</span><input class="iinput" id="custLot" placeholder="Lot / Address"/></div>
   <div class="idivider"></div>
-  <div class="ifield"><span class="ilabel">Plan</span><input class="iinput" id="custPlan" placeholder="Floorplan"/></div>
-  <div class="idivider"></div>
   <div class="ifield"><span class="ilabel">Date</span><input class="iinput" id="custDate" type="date"/></div>
   <div class="idivider"></div>
   <div class="ifield"><span class="ilabel">Agent</span><input class="iinput" id="custAgent" placeholder="Agent"/></div>
@@ -224,6 +298,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: 
     <span class="ilabel">Package:</span>
     <select class="pkg-sel" id="pkgSel" onchange="switchPkg()"></select>
   </div>
+  <div class="idivider"></div>
+  <button class="btn-import" onclick="openImport()">⬆ Import</button>
 </div>
 
 <div class="mob-nav" id="mobNav"><div class="mob-nav-inner" id="mobNavInner"></div></div>
@@ -247,6 +323,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: 
       <div class="btm-total-val" id="btmTotal">$0</div>
     </div>
     <button class="btn btn-clear" onclick="clearAll()">Clear</button>
+    <button class="btn btn-save" onclick="saveSelection()">💾 Save</button>
     <button class="btn btn-report" onclick="generatePDF()">⬇ Report</button>
   </div>
 </div>
@@ -435,8 +512,8 @@ function generatePDF() {
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(150, 150, 150);
   const p = pkg();
   doc.text(`Package: ${p.name}  |  Base Price: ${fmt(p.basePrice)}`, M + 8, 47);
-  const cN = document.getElementById('custName').value||'—', cL = document.getElementById('custLot').value||'—', cP = document.getElementById('custPlan').value||'—', cD = document.getElementById('custDate').value||'—', cA = document.getElementById('custAgent').value||'—';
-  doc.text(`Customer: ${cN}  |  Lot: ${cL}  |  Plan: ${cP}  |  Date: ${cD}  |  Agent: ${cA}`, M + 8, 60);
+  const cN = document.getElementById('custName').value||'—', cL = document.getElementById('custLot').value||'—', cD = document.getElementById('custDate').value||'—', cA = document.getElementById('custAgent').value||'—';
+  doc.text(`Customer: ${cN}  |  Lot / Address: ${cL}  |  Date: ${cD}  |  Agent: ${cA}`, M + 8, 60);
   doc.setTextColor(200, 16, 46); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
   doc.text(fmt(calcTotal()), W - M, 46, { align: 'right' });
   doc.setFontSize(6); doc.setFont('helvetica', 'normal'); doc.setTextColor(120, 120, 120);
@@ -488,8 +565,232 @@ function generatePDF() {
   doc.save(`Selections_${(cN || 'Report').replace(/\s+/g, '_')}_${cD || 'draft'}.pdf`);
 }
 
+
+// ── TOAST ──
+function showToast(msg, isErr) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderLeftColor = isErr ? '#c8102e' : '#1a7a3e';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// ── BUILD SELECTION DATA BLOB ──
+function buildSelectionBlob() {
+  const p = pkg();
+  const ps = selections[curPkgId] || {};
+  const sectionsData = visSecs().map(sec => ({
+    label: sec.label,
+    items: sec.items
+      .filter(i => ps[i.id]?.selected)
+      .map(i => {
+        const s = ps[i.id];
+        const adj = priceAdj(s?.selectedOption || '');
+        return {
+          name: i.name,
+          selectedOption: s?.selectedOption || '',
+          flatPrice: i.price || 0,
+          optionPrice: adj,
+          total: (i.price || 0) + adj
+        };
+      })
+  })).filter(s => s.items.length > 0);
+
+  return {
+    package_name: p?.name || '',
+    base_price: p?.basePrice || 0,
+    total_price: calcTotal(),
+    sections: sectionsData
+  };
+}
+
+// ── SAVE SELECTION ──
+async function saveSelection() {
+  const cN = document.getElementById('custName').value.trim();
+  const cL = document.getElementById('custLot').value.trim();
+  const cD = document.getElementById('custDate').value;
+  const cA = document.getElementById('custAgent').value.trim();
+
+  if (!cN || !cL) { showToast('Please enter Customer Name and Address before saving.', true); return; }
+
+  // Check if address already exists
+  const { data: existing } = await sb.from('selections').select('id, customer_name, date').eq('address', cL).maybeSingle();
+
+  if (existing) {
+    const proceed = confirm(
+      `A selection already exists for address "${cL}" (Customer: ${existing.customer_name}, Date: ${existing.date}).\n\nDo you want to overwrite it?`
+    );
+    if (!proceed) return;
+
+    // Update existing row
+    const { error } = await sb.from('selections')
+      .update({
+        customer_name: cN,
+        date: cD || null,
+        agent_name: cA,
+        data: buildSelectionBlob(),
+      })
+      .eq('address', cL);
+
+    if (error) { showToast('Save failed: ' + error.message, true); return; }
+    showToast('Selection updated successfully');
+    return;
+  }
+
+  // Insert new row
+  const { error } = await sb.from('selections').insert({
+    customer_name: cN,
+    address: cL,
+    date: cD || null,
+    agent_name: cA,
+    data: buildSelectionBlob(),
+  });
+
+  if (error) { showToast('Save failed: ' + error.message, true); return; }
+  showToast('Selection saved successfully');
+}
+
+// ── IMPORT MODAL ──
+let allSavedSelections = [];
+let selectedImportId = null;
+
+async function openImport() {
+  selectedImportId = null;
+  document.getElementById('filterName').value = '';
+  document.getElementById('filterAddress').value = '';
+  document.getElementById('filterAgent').value = '';
+  document.getElementById('filterDate').value = '';
+  document.getElementById('importOverlay').classList.add('open');
+
+  const { data, error } = await sb.from('selections').select('id, customer_name, address, agent_name, date, created_at, data').order('created_at', { ascending: false });
+  if (error) { showToast('Failed to load selections: ' + error.message, true); return; }
+  allSavedSelections = data || [];
+  filterTable();
+}
+
+function closeImport() {
+  document.getElementById('importOverlay').classList.remove('open');
+  selectedImportId = null;
+}
+
+function filterTable() {
+  const fN = document.getElementById('filterName').value.toLowerCase();
+  const fA = document.getElementById('filterAddress').value.toLowerCase();
+  const fAg = document.getElementById('filterAgent').value.toLowerCase();
+  const fD = document.getElementById('filterDate').value;
+
+  const filtered = allSavedSelections.filter(r => {
+    if (fN && !(r.customer_name || '').toLowerCase().includes(fN)) return false;
+    if (fA && !(r.address || '').toLowerCase().includes(fA)) return false;
+    if (fAg && !(r.agent_name || '').toLowerCase().includes(fAg)) return false;
+    if (fD && r.date !== fD) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('importTbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No saved selections found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => `
+    <tr id="irow_${r.id}" onclick="selectImportRow('${r.id}')" class="${selectedImportId === r.id ? 'selected-row' : ''}">
+      <td>${r.customer_name || '—'}</td>
+      <td>${r.address || '—'}</td>
+      <td>${r.agent_name || '—'}</td>
+      <td>${r.date || '—'}</td>
+      <td style="font-size:.72rem;color:var(--muted)">${r.created_at ? new Date(r.created_at).toLocaleDateString() : '—'}</td>
+    </tr>`).join('');
+}
+
+function selectImportRow(id) {
+  selectedImportId = id;
+  // Highlight selected row
+  document.querySelectorAll('#importTbody tr').forEach(tr => tr.classList.remove('selected-row'));
+  const row = document.getElementById('irow_' + id);
+  if (row) row.classList.add('selected-row');
+}
+
+function confirmImport() {
+  if (!selectedImportId) { showToast('Please select a row to import.', true); return; }
+  const row = allSavedSelections.find(r => r.id === selectedImportId);
+  if (!row) return;
+
+  // Populate info bar fields
+  document.getElementById('custName').value = row.customer_name || '';
+  document.getElementById('custLot').value = row.address || '';
+  document.getElementById('custDate').value = row.date || '';
+  document.getElementById('custAgent').value = row.agent_name || '';
+
+  // Find the matching package by name and restore selections
+  const blob = row.data || {};
+  const matchedPkg = packages.find(p => p.name === blob.package_name);
+  if (matchedPkg) {
+    curPkgId = matchedPkg.id;
+    // Rebuild selections from blob
+    selections[curPkgId] = {};
+    const ps = selections[curPkgId];
+    (blob.sections || []).forEach(sec => {
+      const liveSec = matchedPkg.sections?.find(s => s.label === sec.label);
+      (sec.items || []).forEach(item => {
+        const liveItem = liveSec?.items?.find(i => i.name === item.name);
+        if (liveItem) {
+          ps[liveItem.id] = { selected: true, selectedOption: item.selectedOption };
+        }
+      });
+    });
+  }
+
+  closeImport();
+  renderAll();
+  showToast('Selection loaded — ' + (row.customer_name || 'Unknown'));
+}
+
+// Close modal on backdrop click
+document.getElementById('importOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeImport();
+});
+
 async function init() { const ok = await checkAuth(); if (ok) await loadPackages(); }
 init();
 </script>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importOverlay">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-title">Import Saved Selection</div>
+      <button class="modal-close" onclick="closeImport()">✕</button>
+    </div>
+    <div class="filter-row">
+      <input class="filter-input" id="filterName" placeholder="Filter by Customer..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterAddress" placeholder="Filter by Address..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterAgent" placeholder="Filter by Agent..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterDate" type="date" oninput="filterTable()" title="Filter by Date"/>
+    </div>
+    <div class="sel-table-wrap">
+      <table class="sel-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Address</th>
+            <th>Agent</th>
+            <th>Date</th>
+            <th>Saved</th>
+          </tr>
+        </thead>
+        <tbody id="importTbody"></tbody>
+      </table>
+    </div>
+    <div class="import-actions">
+      <button class="btn-modal btn-modal-outline" onclick="closeImport()">Cancel</button>
+      <button class="btn-modal btn-modal-red" onclick="confirmImport()">Load Selection</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
 </body>
 </html>

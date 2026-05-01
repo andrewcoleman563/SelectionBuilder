@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>BuilderSelect — Package Builder</title>
+<title>Todd Homes LLC — Package Builder</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
@@ -216,20 +216,25 @@ td { padding: 9px 14px; font-size: .83rem; vertical-align: middle; }
   .btn { font-size: .72rem; padding: 6px 10px; }
 }
 @media (min-width: 861px) { .mob-nav { display: none !important; } }
+
+.hdr-logo-img { height: 36px; width: auto; object-fit: contain; }
 </style>
 </head>
 <body>
 
 <div id="authGate">
-  <div class="gate-logo">Builder<span>Select</span></div>
+  <div class="gate-logo">Todd <span>Homes</span></div>
   <div class="spinner"></div>
   <div class="gate-msg">Verifying access…</div>
 </div>
 
 <div class="header">
-  <div>
-    <div class="logo">Package <span>Builder</span></div>
-    <div class="logo-sub">Master File Management</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <img src="https://selectionsbuilderandrewcoleman.netlify.app/Toddlogo.png" alt="Todd Homes LLC" class="hdr-logo-img" onerror="this.style.display='none'"/>
+    <div>
+      <div class="logo">Package <span>Builder</span></div>
+      <div class="logo-sub">Todd Homes LLC · Master File Management</div>
+    </div>
   </div>
   <div class="hdr-right">
     <span class="hdr-user" id="hdrUser"></span>
@@ -312,81 +317,14 @@ async function signOut(e) {
   window.location.href = 'index.html';
 }
 
-function defaultSections() {
-  return [
-    { id: 'appliances', label: 'Appliances', items: [
-      { id: 'a1', name: 'Refrigerator', options: ['Standard (included)', 'French Door +$800', 'Counter-Depth +$1,400'], price: 0, available: true },
-      { id: 'a2', name: 'Range / Oven', options: ['Electric Standard', 'Gas Freestanding +$350', 'Double Oven +$900'], price: 0, available: true },
-      { id: 'a3', name: 'Dishwasher', options: ['Standard', 'Quiet Series +$250', 'Panel-Ready +$600'], price: 0, available: true },
-      { id: 'a4', name: 'Microwave', options: ['Over-Range Standard', 'Built-In +$400', 'Drawer +$900'], price: 0, available: true },
-    ]},
-    { id: 'fixtures', label: 'Fixtures', items: [
-      { id: 'f1', name: 'Kitchen Faucet', options: ['Chrome Standard', 'Brushed Nickel +$120', 'Matte Black +$200', 'Oil-Rubbed Bronze +$180'], price: 0, available: true },
-      { id: 'f2', name: 'Bath Faucets', options: ['Chrome Standard', 'Brushed Nickel +$90', 'Matte Black +$160'], price: 0, available: true },
-      { id: 'f3', name: 'Shower Heads', options: ['Standard', 'Rain Head +$300', 'Body Spray System +$800'], price: 0, available: true },
-      { id: 'f4', name: 'Tub Style', options: ['Alcove Standard', 'Freestanding +$1,200', 'Soaking +$900'], price: 0, available: true },
-    ]},
-    { id: 'kitchen', label: 'Kitchen', items: [
-      { id: 'k1', name: 'Cabinets', options: ['Builder Grade White', 'Shaker White +$1,800', 'Shaker Gray +$2,000', 'Two-Tone +$3,200'], price: 0, available: true },
-      { id: 'k2', name: 'Countertops', options: ['Laminate Standard', 'Quartz +$3,500', 'Granite +$2,800', 'Marble +$5,500'], price: 0, available: true },
-      { id: 'k3', name: 'Floor', options: ['Vinyl Plank', 'Hardwood +$2,200', 'Tile +$1,800'], price: 0, available: true },
-      { id: 'k4', name: 'Backsplash', options: ['None', 'Subway Tile +$600', 'Mosaic +$1,100', 'Full-Height +$2,000'], price: 0, available: true },
-      { id: 'k5', name: 'Island', options: ['None', 'Standard Island +$3,500', 'Waterfall Edge +$5,000'], price: 0, available: true },
-    ]},
-    { id: 'bath', label: 'Bath', items: [
-      { id: 'b1', name: 'Vanity', options: ['Standard', 'Upgraded Single +$600', 'Double Vanity +$1,400'], price: 0, available: true },
-      { id: 'b2', name: 'Tile Surround', options: ['Standard', 'Subway Tile +$500', 'Large Format +$900', 'Full Custom +$2,200'], price: 0, available: true },
-      { id: 'b3', name: 'Mirror / Cabinet', options: ['Flat Mirror', 'Framed Mirror +$200', 'Medicine Cabinet +$450'], price: 0, available: true },
-    ]},
-    { id: 'masterbed', label: 'Master Bed', items: [
-      { id: 'm1', name: 'Closet System', options: ['Wire Shelving', 'Wood System +$1,200', 'Custom Built-In +$3,500'], price: 0, available: true },
-      { id: 'm2', name: 'En-Suite Shower', options: ['Standard', 'Frame-less Glass +$1,500', 'Walk-In Wet Room +$4,000'], price: 0, available: true },
-      { id: 'm3', name: 'Flooring', options: ['Carpet Standard', 'LVP +$1,100', 'Hardwood +$2,400'], price: 0, available: true },
-    ]},
-    { id: 'structure', label: 'Structure', items: [
-      { id: 'st1', name: 'Ceiling Height', options: ['9 ft Standard', '10 ft +$1,500', 'Vaulted +$4,000'], price: 0, available: true },
-      { id: 'st2', name: 'Bonus Room', options: ['None', 'Finished +$18,000', 'Pre-Plumbed Bath +$23,000'], price: 0, available: true },
-      { id: 'st3', name: 'Foundation', options: ['Slab Standard', 'Crawl Space +$8,000', 'Full Basement +$45,000'], price: 0, available: true },
-    ]},
-    { id: 'exterior', label: 'Exterior', items: [
-      { id: 'e1', name: 'Siding', options: ['Vinyl Standard', 'Hardie Plank +$4,500', 'Brick Front +$8,000', 'Full Brick +$22,000'], price: 0, available: true },
-      { id: 'e2', name: 'Roof', options: ['Architectural Shingle', '30-Year +$1,800', 'Metal +$12,000'], price: 0, available: true },
-      { id: 'e3', name: 'Garage Door', options: ['Steel Standard', 'Carriage Style +$900', 'Glass Panel +$2,200'], price: 0, available: true },
-      { id: 'e4', name: 'Deck / Patio', options: ['None', 'Concrete Patio +$3,000', 'Wood Deck +$6,500', 'Composite Deck +$11,000'], price: 0, available: true },
-    ]},
-    { id: 'electrical', label: 'Electrical', items: [
-      { id: 'el1', name: 'Panel Size', options: ['200A Standard', '400A +$1,800'], price: 0, available: true },
-      { id: 'el2', name: 'Lighting Package', options: ['Standard', 'Recessed Upgrade +$1,200', 'Smart Lighting +$3,500'], price: 0, available: true },
-      { id: 'el3', name: 'EV Charger', options: ['None', '240V Outlet +$400', 'Level 2 Charger +$900'], price: 0, available: true },
-      { id: 'el4', name: 'Generator Prep', options: ['None', 'Transfer Switch +$1,500', 'Whole-Home +$8,000'], price: 0, available: true },
-    ]},
-    { id: 'other', label: 'Other', items: [
-      { id: 'o1', name: 'HVAC', options: ['Standard', 'Two-Zone +$3,200', 'Geothermal +$18,000'], price: 0, available: true },
-      { id: 'o2', name: 'Smart Home', options: ['None', 'Basic +$1,200', 'Full Package +$5,500'], price: 0, available: true },
-      { id: 'o3', name: 'Landscaping', options: ['Seed & Straw', 'Sod Front +$2,000', 'Full Sod +$5,500'], price: 0, available: true },
-    ]},
-  ];
-}
 
 let packages = [], curPkgId = null, activeSec = null, addingToSec = null;
 
 async function loadPackages() {
   const { data, error } = await sb.from('packages').select('id, data');
   if (error) { toast('Error loading: ' + error.message, true); return; }
-  if (data && data.length > 0) {
-    packages = data.map(row => ({ id: row.id, ...row.data }));
-  } else {
-    const defaults = [
-      { id: 'pkg_1', name: 'Standard Finish', basePrice: 350000, sections: defaultSections() },
-      { id: 'pkg_2', name: 'Premium Finish',  basePrice: 420000, sections: defaultSections() },
-    ];
-    for (const p of defaults) {
-      const { id, ...data } = p;
-      await sb.from('packages').insert({ id, data });
-    }
-    packages = defaults;
-  }
-  curPkgId = packages[0]?.id;
+  packages = data ? data.map(row => ({ id: row.id, ...row.data })) : [];
+  curPkgId = packages[0]?.id || null;
   activeSec = pkg()?.sections[0]?.id || null;
   renderAll();
 }
@@ -443,6 +381,7 @@ function renderMobNav() {
 
 function renderMain() {
   const sec = curSec(); const area = document.getElementById('mainArea');
+  if (!pkg()) { area.innerHTML = '<div style="padding:48px;text-align:center;color:var(--muted)"><div style="font-family:Bebas Neue,sans-serif;font-size:1.8rem;letter-spacing:2px;color:#ccc;margin-bottom:8px">No Packages Yet</div><div style="font-size:.85rem">Click <strong>Manage Packages</strong> to create your first package.</div></div>'; return; }
   if (!sec) { area.innerHTML = '<p style="padding:40px;color:var(--muted)">No sections. Add one from the sidebar.</p>'; return; }
   const p = pkg();
   area.innerHTML = `
@@ -524,10 +463,12 @@ function setPkgBase(id, val) { const p = packages.find(x => x.id === id); if (p)
 async function addPackage() {
   const name = document.getElementById('newPkgName').value.trim(); if (!name) return;
   const id = 'pkg_' + Date.now();
-  const newPkg = { id, name, basePrice: 350000, sections: defaultSections() };
-  const { error } = await sb.from('packages').insert({ id, data: { name, basePrice: newPkg.basePrice, sections: newPkg.sections } });
+  const newPkg = { id, name, basePrice: 0, sections: [] };
+  const { error } = await sb.from('packages').insert({ id, data: { name, basePrice: 0, sections: [] } });
   if (error) { toast('Error: ' + error.message, true); return; }
-  packages.push(newPkg); document.getElementById('newPkgName').value = ''; renderPkgList(); renderPkgSel(); toast('Package created');
+  packages.push(newPkg); document.getElementById('newPkgName').value = '';
+  curPkgId = id; activeSec = null;
+  renderPkgList(); renderPkgSel(); renderAll(); toast('Package created — ready to build');
 }
 async function dupPkg(id) {
   const orig = packages.find(p => p.id === id); if (!orig) return;
