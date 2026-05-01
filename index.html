@@ -6,26 +6,28 @@
 <title>BuilderSelect — Sign In</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --dark:    #0e0c09;
-  --dark2:   #161310;
-  --surface: #1e1a14;
-  --border:  #2e2820;
-  --gold:    #c8a840;
-  --gold2:   #e8c860;
-  --muted:   #6a6050;
-  --text:    #e8e0d0;
-  --text2:   #a89880;
-  --red:     #c0392b;
-  --green:   #2d7d4e;
+  --red:       #c8102e;
+  --red-dark:  #a00d24;
+  --red-light: #fdf0f2;
+  --red-mid:   #f5c2cb;
+  --black:     #111111;
+  --black2:    #1e1e1e;
+  --white:     #ffffff;
+  --off-white: #f8f8f8;
+  --border:    #e0e0e0;
+  --border2:   #cccccc;
+  --muted:     #888888;
+  --text:      #1e1e1e;
+  --green:     #1a7a3e;
 }
 
 body {
-  background: var(--dark);
+  background: var(--off-white);
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
   min-height: 100vh;
@@ -38,169 +40,169 @@ body {
   overflow: hidden;
 }
 
-/* Subtle grid background */
+/* Diagonal stripe background */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(200,168,64,.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(200,168,64,.03) 1px, transparent 1px);
-  background-size: 48px 48px;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 40px,
+    rgba(200,16,46,.03) 40px,
+    rgba(200,16,46,.03) 41px
+  );
   pointer-events: none;
 }
 
-/* Gold glow orb */
+/* Red top bar */
 body::after {
   content: '';
   position: fixed;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(200,168,64,.08) 0%, transparent 70%);
-  pointer-events: none;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: var(--red);
 }
 
 .card {
-  background: var(--surface);
+  background: var(--white);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 48px 44px 40px;
+  border-radius: 4px;
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   position: relative;
-  box-shadow: 0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(200,168,64,.05);
+  box-shadow: 0 8px 40px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.06);
+  overflow: hidden;
 }
 
-/* Top gold accent line */
+/* Red left accent bar */
 .card::before {
   content: '';
   position: absolute;
-  top: 0; left: 20%; right: 20%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  border-radius: 1px;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: var(--red);
 }
 
-.brand {
+.card-header {
+  background: var(--black);
+  padding: 32px 36px 28px;
   text-align: center;
-  margin-bottom: 36px;
 }
+
 .brand-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 2px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem;
+  color: var(--white);
+  letter-spacing: 4px;
   line-height: 1;
 }
+.brand-logo span { color: var(--red); }
+
 .brand-sub {
   font-size: .6rem;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--muted);
-  margin-top: 5px;
-}
-.brand-divider {
-  width: 40px;
-  height: 1px;
-  background: var(--border);
-  margin: 16px auto 0;
+  color: rgba(255,255,255,.4);
+  margin-top: 6px;
 }
 
+.card-body { padding: 32px 36px 36px; }
+
 .form-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 22px;
-  text-align: center;
+  font-size: .65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.form-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 .field { margin-bottom: 16px; }
 .field label {
   display: block;
   font-size: .62rem;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 7px;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
 .field input {
   width: 100%;
-  background: var(--dark2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: var(--off-white);
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
   font-size: .92rem;
-  padding: 12px 14px;
-  transition: border-color .2s, box-shadow .2s;
+  padding: 11px 13px;
+  transition: border-color .18s, box-shadow .18s;
   outline: none;
-  -webkit-appearance: none;
 }
 .field input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(200,168,64,.08);
+  border-color: var(--red);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(200,16,46,.08);
 }
-.field input::placeholder { color: var(--muted); }
+.field input::placeholder { color: #bbb; }
 
-/* Password wrapper for show/hide */
 .pw-wrap { position: relative; }
-.pw-wrap input { padding-right: 44px; }
+.pw-wrap input { padding-right: 52px; }
 .pw-toggle {
   position: absolute;
-  right: 13px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--muted);
   cursor: pointer;
-  font-size: .78rem;
+  font-size: .72rem;
+  font-weight: 600;
   letter-spacing: .5px;
+  text-transform: uppercase;
   padding: 4px;
   transition: color .15s;
 }
-.pw-toggle:hover { color: var(--gold); }
+.pw-toggle:hover { color: var(--red); }
 
 .btn-submit {
   width: 100%;
-  background: var(--gold);
+  background: var(--red);
   border: none;
-  border-radius: 8px;
-  color: #1a1200;
+  border-radius: 3px;
+  color: var(--white);
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  font-size: .9rem;
+  font-size: .85rem;
   font-weight: 700;
-  letter-spacing: .5px;
-  padding: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px;
   margin-top: 8px;
-  transition: background .18s, transform .12s, box-shadow .18s;
-  position: relative;
-  overflow: hidden;
+  transition: background .16s, transform .1s, box-shadow .16s;
 }
 .btn-submit:hover {
-  background: var(--gold2);
-  box-shadow: 0 4px 20px rgba(200,168,64,.25);
+  background: var(--red-dark);
+  box-shadow: 0 4px 16px rgba(200,16,46,.25);
 }
 .btn-submit:active { transform: scale(.98); }
-.btn-submit:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
-/* Spinner inside button */
 .spinner {
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(0,0,0,.2);
-  border-top-color: #1a1200;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
   border-radius: 50%;
   animation: spin .6s linear infinite;
   vertical-align: middle;
@@ -209,126 +211,142 @@ body::after {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .msg {
-  margin-top: 14px;
-  padding: 10px 14px;
-  border-radius: 7px;
-  font-size: .82rem;
-  text-align: center;
+  margin-top: 12px;
+  padding: 10px 13px;
+  border-radius: 3px;
+  font-size: .8rem;
   display: none;
 }
-.msg.error { background: rgba(192,57,43,.12); border: 1px solid rgba(192,57,43,.3); color: #e57869; display: block; }
-.msg.success { background: rgba(45,125,78,.12); border: 1px solid rgba(45,125,78,.3); color: #5dba85; display: block; }
+.msg.error { background: var(--red-light); border: 1px solid var(--red-mid); color: var(--red-dark); display: block; }
+.msg.success { background: #e8f5ee; border: 1px solid #a3d4b5; color: var(--green); display: block; }
 
 .footer-note {
   text-align: center;
-  margin-top: 28px;
-  font-size: .68rem;
-  color: var(--muted);
+  margin-top: 20px;
+  font-size: .65rem;
+  color: #bbb;
   letter-spacing: .5px;
 }
 
-/* Logged-in state */
-.logged-in-card { display: none; text-align: center; }
-.logged-in-card .greeting {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.4rem;
-  color: var(--gold);
-  margin-bottom: 6px;
+/* ── LOGGED IN STATE ── */
+.logged-in-card { display: none; }
+
+.logged-in-card .card-body { padding: 32px 36px 36px; }
+
+.greeting {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  letter-spacing: 2px;
+  color: var(--black);
+  line-height: 1;
+  margin-bottom: 4px;
 }
-.logged-in-card .user-email {
-  font-size: .78rem;
-  color: var(--muted);
-  margin-bottom: 28px;
-}
+.greeting span { color: var(--red); }
+.user-email { font-size: .75rem; color: var(--muted); margin-bottom: 24px; }
+
 .nav-buttons { display: flex; flex-direction: column; gap: 10px; }
 .nav-btn {
   display: block;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
+  padding: 14px 18px;
   text-decoration: none;
-  transition: all .18s;
-  text-align: left;
+  transition: all .16s;
+  position: relative;
+  overflow: hidden;
 }
-.nav-btn:hover { border-color: var(--gold); background: rgba(200,168,64,.05); }
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--red);
+  transform: scaleY(0);
+  transition: transform .16s;
+}
+.nav-btn:hover { border-color: var(--red); background: var(--red-light); }
+.nav-btn:hover::before { transform: scaleY(1); }
 .nav-btn-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Bebas Neue', sans-serif;
   font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--gold);
+  letter-spacing: 2px;
+  color: var(--black);
 }
-.nav-btn-desc { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+.nav-btn-desc { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
 .btn-logout {
+  width: 100%;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 7px;
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
   color: var(--muted);
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
   font-size: .76rem;
-  padding: 8px 16px;
-  margin-top: 20px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px;
+  margin-top: 16px;
   transition: all .15s;
 }
-.btn-logout:hover { border-color: var(--red); color: #e57869; }
+.btn-logout:hover { border-color: var(--red); color: var(--red); background: var(--red-light); }
 
-/* Responsive */
 @media (max-width: 480px) {
-  .card { padding: 36px 24px 30px; }
-  .brand-logo { font-size: 1.9rem; }
+  .card-header { padding: 24px 24px 20px; }
+  .card-body { padding: 24px 24px 28px; }
+  .brand-logo { font-size: 2.4rem; }
 }
 </style>
 </head>
 <body>
 
+<!-- LOGIN CARD -->
 <div class="card" id="loginCard">
-  <div class="brand">
-    <div class="brand-logo">BuilderSelect</div>
+  <div class="card-header">
+    <div class="brand-logo">Builder<span>Select</span></div>
     <div class="brand-sub">Selection Management System</div>
-    <div class="brand-divider"></div>
   </div>
-
-  <div class="form-title">Staff Sign In</div>
-
-  <div class="field">
-    <label>Email Address</label>
-    <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email"/>
-  </div>
-
-  <div class="field">
-    <label>Password</label>
-    <div class="pw-wrap">
-      <input type="password" id="passInput" placeholder="••••••••" autocomplete="current-password"/>
-      <button class="pw-toggle" type="button" onclick="togglePw()" id="pwToggle">Show</button>
+  <div class="card-body">
+    <div class="form-title">Staff Sign In</div>
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email"/>
     </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="passInput" placeholder="••••••••" autocomplete="current-password"/>
+        <button class="pw-toggle" type="button" onclick="togglePw()" id="pwToggle">Show</button>
+      </div>
+    </div>
+    <button class="btn-submit" id="submitBtn" onclick="signIn()">Sign In</button>
+    <div class="msg" id="msg"></div>
+    <div class="footer-note">Access restricted to authorized staff only</div>
   </div>
-
-  <button class="btn-submit" id="submitBtn" onclick="signIn()">Sign In</button>
-  <div class="msg" id="msg"></div>
-
-  <div class="footer-note">Access restricted to authorized staff only</div>
 </div>
 
-<!-- Shown after login -->
+<!-- LOGGED IN CARD -->
 <div class="card logged-in-card" id="loggedInCard">
-  <div class="brand">
-    <div class="brand-logo">BuilderSelect</div>
+  <div class="card-header">
+    <div class="brand-logo">Builder<span>Select</span></div>
     <div class="brand-sub">Selection Management System</div>
-    <div class="brand-divider"></div>
   </div>
-  <div class="greeting" id="greeting">Welcome back</div>
-  <div class="user-email" id="userEmail"></div>
-  <div class="nav-buttons">
-    <a href="PackageBuilder.html" class="nav-btn">
-      <div class="nav-btn-title">Package Builder</div>
-      <div class="nav-btn-desc">Create and manage master selection files</div>
-    </a>
-    <a href="SelectionPage.html" class="nav-btn">
-      <div class="nav-btn-title">Selection Page</div>
-      <div class="nav-btn-desc">Walk through selections with a customer</div>
-    </a>
+  <div class="card-body">
+    <div class="greeting">Welcome, <span id="greetName">—</span></div>
+    <div class="user-email" id="userEmail"></div>
+    <div class="nav-buttons">
+      <a href="PackageBuilder.html" class="nav-btn">
+        <div class="nav-btn-title">Package Builder</div>
+        <div class="nav-btn-desc">Create and manage master selection files</div>
+      </a>
+      <a href="SelectionPage.html" class="nav-btn">
+        <div class="nav-btn-title">Selection Page</div>
+        <div class="nav-btn-desc">Walk through selections with a customer</div>
+      </a>
+    </div>
+    <button class="btn-logout" onclick="signOut()">Sign Out</button>
   </div>
-  <button class="btn-logout" onclick="signOut()">Sign Out</button>
 </div>
 
 <script>
@@ -336,90 +354,74 @@ const SUPABASE_URL = 'https://skbkwjqpbhuuwxpxbmhn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYmt3anFwYmh1dXd4cHhibWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTU2NTUsImV4cCI6MjA5MzE3MTY1NX0.OoWqErkV8ri-F2g1ze0SHvM9DackPYHAD0RCJ65RsQA';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── CHECK SESSION ON LOAD ──
 async function checkSession() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) showLoggedIn(session.user);
 }
 
-// ── SIGN IN ──
 async function signIn() {
   const email = document.getElementById('emailInput').value.trim().toLowerCase();
   const pass  = document.getElementById('passInput').value;
   const btn   = document.getElementById('submitBtn');
-  const msg   = document.getElementById('msg');
 
-  msg.className = 'msg';
-  msg.textContent = '';
+  clearMsg();
+  if (!email || !pass) { showMsg('Please enter your email and password.', 'error'); return; }
 
-  if (!email || !pass) {
-    showMsg('Please enter your email and password.', 'error');
-    return;
-  }
-
-  // Loading state
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Signing in…';
 
-  // Sign in with Supabase Auth only
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
 
   if (error) {
     showMsg('Incorrect email or password. Please try again.', 'error');
-    resetBtn();
-    return;
+    resetBtn(); return;
   }
 
-  // Success
   showLoggedIn(data.user);
   resetBtn();
 }
 
-// ── SIGN OUT ──
 async function signOut() {
   await sb.auth.signOut();
   document.getElementById('loggedInCard').style.display = 'none';
   document.getElementById('loginCard').style.display = 'block';
   document.getElementById('emailInput').value = '';
   document.getElementById('passInput').value = '';
+  clearMsg();
 }
 
-// ── SHOW LOGGED IN STATE ──
 function showLoggedIn(user) {
   document.getElementById('loginCard').style.display = 'none';
-  const card = document.getElementById('loggedInCard');
-  card.style.display = 'block';
+  document.getElementById('loggedInCard').style.display = 'block';
   document.getElementById('userEmail').textContent = user.email;
   const name = user.email.split('@')[0];
-  document.getElementById('greeting').textContent = 'Welcome, ' + name.charAt(0).toUpperCase() + name.slice(1);
+  document.getElementById('greetName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
 }
 
-// ── HELPERS ──
 function showMsg(text, type) {
   const msg = document.getElementById('msg');
   msg.textContent = text;
   msg.className = 'msg ' + type;
 }
-
+function clearMsg() {
+  const msg = document.getElementById('msg');
+  msg.className = 'msg';
+  msg.textContent = '';
+}
 function resetBtn() {
   const btn = document.getElementById('submitBtn');
   btn.disabled = false;
   btn.innerHTML = 'Sign In';
 }
-
 function togglePw() {
-  const input  = document.getElementById('passInput');
+  const input = document.getElementById('passInput');
   const toggle = document.getElementById('pwToggle');
-  const isHidden = input.type === 'password';
-  input.type = isHidden ? 'text' : 'password';
-  toggle.textContent = isHidden ? 'Hide' : 'Show';
+  const hidden = input.type === 'password';
+  input.type = hidden ? 'text' : 'password';
+  toggle.textContent = hidden ? 'Hide' : 'Show';
 }
 
-// Allow Enter key to submit
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') signIn();
-});
-
+document.addEventListener('keydown', e => { if (e.key === 'Enter') signIn(); });
 checkSession();
 </script>
 </body>
