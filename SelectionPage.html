@@ -746,12 +746,15 @@ function confirmImport() {
   showToast('Selection loaded — ' + (row.customer_name || 'Unknown'));
 }
 
-// Close modal on backdrop click
-document.getElementById('importOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeImport();
-});
-
-async function init() { const ok = await checkAuth(); if (ok) await loadPackages(); }
+async function init() {
+  const ok = await checkAuth();
+  if (!ok) return;
+  // Wire backdrop click now that DOM is ready
+  document.getElementById('importOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeImport();
+  });
+  await loadPackages();
+}
 init();
 </script>
 
