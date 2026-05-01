@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>BuilderSelect — Package Builder</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #f5f2ee;
+  --surface: #ffffff;
+  --card: #faf8f5;
+  --border: #e0d9cf;
+  --border2: #cdc4b6;
+  --accent: #8b6914;
+  --accent-light: #f7f0e0;
+  --text: #1c1a17;
+  --muted: #7a7060;
+  --red: #c0392b;
+  --green: #2d7d4e;
+  --dark: #12100d;
+  --gold: #c8a840;
+  --sidebar-muted: #5a5448;
+  --sidebar-w: 200px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+/* ── AUTH GATE ── */
+#authGate {
+  position: fixed; inset: 0; background: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; flex-direction: column; gap: 12px;
+}
+#authGate .gate-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 700; color: var(--gold); letter-spacing: 2px;
+}
+#authGate .gate-msg { font-size: .8rem; color: var(--sidebar-muted); letter-spacing: 1px; }
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(200,168,64,.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── HEADER ── */
+.header {
+  background: var(--dark); height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; box-shadow: 0 2px 16px rgba(0,0,0,.3);
+  position: sticky; top: 0; z-index: 200;
+}
+.logo { font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 700; color: var(--gold); letter-spacing: 1px; line-height: 1.1; }
+.logo-sub { font-size: .5rem; letter-spacing: 3px; text-transform: uppercase; color: var(--sidebar-muted); }
+.hdr-right { display: flex; align-items: center; gap: 10px; }
+.hdr-user { font-size: .72rem; color: var(--sidebar-muted); }
+.lnk { background: transparent; border: 1px solid rgba(255,255,255,.14); border-radius: 6px; color: #a0988a; font-family: 'DM Sans', sans-serif; font-size: .72rem; padding: 5px 11px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.lnk:hover { border-color: var(--gold); color: var(--gold); }
+.badge-admin { background: var(--red); color: #fff; font-size: .58rem; font-weight: 600; letter-spacing: 2px; padding: 3px 9px; border-radius: 20px; text-transform: uppercase; }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  height: 50px; display: flex; align-items: center;
+  padding: 0 16px; gap: 10px; overflow-x: auto; scrollbar-width: none;
+  position: sticky; top: 64px; z-index: 190;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.toolbar::-webkit-scrollbar { display: none; }
+.tb-label { font-size: .62rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.tb-select {
+  border: 1px solid var(--border2); border-radius: 6px;
+  background: var(--card); color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: .83rem;
+  padding: 5px 22px 5px 9px; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237a7060' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 7px center;
+  background-color: var(--card); min-width: 170px; cursor: pointer; flex-shrink: 0;
+}
+.tb-select:focus { outline: none; border-color: var(--accent); }
+.btn { border: none; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: .76rem; font-weight: 600; padding: 7px 13px; transition: all .14s; white-space: nowrap; flex-shrink: 0; }
+.btn:active { transform: scale(.96); }
+.btn:hover { opacity: .86; }
+.btn-gold { background: var(--accent); color: #fff; }
+.btn-green { background: var(--green); color: #fff; }
+.btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--text); }
+.btn-red-o { background: transparent; border: 1px solid var(--red); color: var(--red); }
+.btn-red { background: var(--red); color: #fff; }
+
+/* ── MOBILE CATEGORY NAV ── */
+.mob-nav {
+  display: none; background: var(--dark);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  overflow-x: auto; scrollbar-width: none;
+  position: sticky; top: calc(64px + 50px); z-index: 180;
+}
+.mob-nav::-webkit-scrollbar { display: none; }
+.mob-nav-inner { display: flex; height: 50px; align-items: stretch; min-width: max-content; }
+.mob-tab {
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 14px; cursor: pointer; color: var(--sidebar-muted);
+  font-size: .6rem; font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
+  border-bottom: 3px solid transparent; white-space: nowrap; transition: all .13s; min-width: 64px;
+}
+.mob-tab:hover { color: #e8e2d8; }
+.mob-tab.active { border-bottom-color: var(--gold); color: var(--gold); }
+
+/* ── PAGE BODY ── */
+.page-body { display: flex; }
+
+/* ── DESKTOP SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--dark); min-height: calc(100vh - 64px - 50px);
+  display: flex; flex-direction: column;
+  position: sticky; top: calc(64px + 50px);
+  height: calc(100vh - 64px - 50px); overflow-y: auto;
+}
+.sb-hd { font-size: .52rem; letter-spacing: 3px; text-transform: uppercase; color: var(--sidebar-muted); padding: 16px 16px 6px; }
+.sb-tab {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; cursor: pointer; color: var(--sidebar-muted);
+  font-size: .82rem; font-weight: 500; border-left: 3px solid transparent; transition: all .13s;
+}
+.sb-tab:hover { background: rgba(255,255,255,.04); color: #e8e2d8; }
+.sb-tab.active { border-left-color: var(--gold); background: rgba(200,168,64,.07); color: var(--gold); }
+.sb-cnt { background: rgba(200,168,64,.13); color: var(--gold); border-radius: 10px; font-size: .57rem; font-weight: 700; padding: 2px 6px; }
+.sb-add { padding: 10px 16px; cursor: pointer; color: var(--gold); font-size: .8rem; font-weight: 500; border-top: 1px solid rgba(255,255,255,.06); margin-top: 6px; }
+.sb-add:hover { background: rgba(200,168,64,.05); }
+
+/* ── MAIN AREA ── */
+.main-area { flex: 1; padding: 20px; overflow-x: hidden; }
+.sec-hdr { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+.sec-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; }
+.sec-meta { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+.sec-actions { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+
+/* ── BASE PRICE ROW ── */
+.base-price-row {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.base-price-row label { font-size: .65rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.base-price-input {
+  border: 1px solid var(--border2); border-radius: 6px;
+  background: var(--card); color: var(--accent);
+  font-family: 'DM Sans', sans-serif; font-size: .92rem; font-weight: 600;
+  padding: 5px 10px; width: 130px;
+}
+.base-price-input:focus { outline: none; border-color: var(--accent); }
+.pkg-name-display { font-size: .8rem; color: var(--muted); }
+.pkg-name-display strong { color: var(--text); }
+
+/* ── TABLE ── */
+.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+table { width: 100%; border-collapse: collapse; background: var(--surface); min-width: 540px; }
+thead { background: var(--dark); }
+th { color: var(--gold); font-size: .62rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 11px 14px; text-align: left; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--accent-light); }
+td { padding: 9px 14px; font-size: .83rem; vertical-align: middle; }
+.e-input { background: transparent; border: none; border-bottom: 1px dashed var(--border2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .83rem; padding: 2px 4px; width: 100%; transition: border-color .15s; }
+.e-input:focus { outline: none; border-bottom-color: var(--accent); }
+.e-price { width: 80px; text-align: right; }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.chip { background: var(--accent-light); border: 1px solid var(--border); border-radius: 20px; color: var(--text); font-size: .68rem; padding: 2px 7px; display: flex; align-items: center; gap: 3px; }
+.del-chip { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .8rem; padding: 0; line-height: 1; transition: color .12s; }
+.del-chip:hover { color: var(--red); }
+.chip-add { background: var(--card); border: 1px dashed var(--border2); border-radius: 20px; color: var(--text); font-size: .68rem; padding: 2px 8px; width: 110px; }
+.chip-add:focus { outline: none; border-color: var(--accent); }
+
+/* ── TOGGLE ── */
+.tog { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+.tog input { opacity: 0; width: 0; height: 0; position: absolute; }
+.tog-track { width: 34px; height: 18px; background: #555; border-radius: 9px; transition: background .18s; flex-shrink: 0; }
+.tog input:checked + .tog-track { background: var(--green); }
+.tog-thumb { position: absolute; left: 3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: left .18s; box-shadow: 0 1px 3px rgba(0,0,0,.2); pointer-events: none; }
+.tog input:checked ~ .tog-thumb { left: 19px; }
+
+/* ── MODALS ── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: none; align-items: center; justify-content: center; padding: 16px; }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; padding: 22px; width: 100%; max-width: 430px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.18); }
+.modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 14px; }
+.m-label { font-size: .62rem; color: var(--muted); display: block; margin: 10px 0 3px; letter-spacing: 1px; text-transform: uppercase; }
+.m-input { background: var(--card); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem; padding: 7px 10px; width: 100%; }
+.m-input:focus { outline: none; border-color: var(--accent); }
+.m-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; flex-wrap: wrap; }
+.pkg-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.pkg-row:last-child { border-bottom: none; }
+.pkg-name-e { background: transparent; border: none; border-bottom: 1px dashed var(--border2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem; flex: 1; padding: 2px 4px; min-width: 90px; }
+.pkg-name-e:focus { outline: none; border-bottom-color: var(--accent); }
+.pkg-base-e { background: transparent; border: none; border-bottom: 1px dashed var(--border2); color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600; width: 80px; text-align: right; padding: 2px 4px; }
+.pkg-base-e:focus { outline: none; border-bottom-color: var(--accent); }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--dark); color: #e8e2d8; border-left: 4px solid var(--gold); border-radius: 8px; padding: 10px 16px; font-size: .8rem; z-index: 999; opacity: 0; transform: translateY(8px); transition: all .25s; pointer-events: none; max-width: 260px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) { .sidebar { display: none; } .mob-nav { display: block; } }
+@media (max-width: 600px) {
+  .header { height: 56px; padding: 0 14px; }
+  .logo { font-size: 1.25rem; }
+  .toolbar { top: 56px; height: 46px; }
+  .mob-nav { top: calc(56px + 46px); }
+  .lnk { display: none; }
+  .main-area { padding: 14px 12px; }
+  .sec-title { font-size: 1.35rem; }
+  .btn { font-size: .72rem; padding: 6px 10px; }
+}
+@media (min-width: 861px) { .mob-nav { display: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- AUTH GATE (shown while checking session) -->
+<div id="authGate">
+  <div class="gate-logo">BuilderSelect</div>
+  <div class="spinner"></div>
+  <div class="gate-msg">Verifying access…</div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="logo">Package Builder</div>
+    <div class="logo-sub">Master File Management</div>
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-user" id="hdrUser"></span>
+    <a href="SelectionPage.html" class="lnk">↗ Selection Page</a>
+    <a href="index.html" class="lnk" onclick="signOut(event)">Sign Out</a>
+    <span class="badge-admin">Admin</span>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <span class="tb-label">Package:</span>
+  <select class="tb-select" id="pkgSel" onchange="switchPkg()"></select>
+  <button class="btn btn-gold" onclick="openPkgMgr()">Manage Packages</button>
+  <button class="btn btn-green" onclick="saveAll()">💾 Save All</button>
+</div>
+
+<!-- MOBILE CATEGORY NAV -->
+<div class="mob-nav" id="mobNav">
+  <div class="mob-nav-inner" id="mobNavInner"></div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+  <div class="sidebar" id="sidebar">
+    <div class="sb-hd">Categories</div>
+    <div class="sb-add" onclick="addSection()">＋ Add Category</div>
+  </div>
+  <div class="main-area" id="mainArea">
+    <div style="padding:40px;color:var(--muted);text-align:center">Loading packages…</div>
+  </div>
+</div>
+
+<!-- Package Manager Modal -->
+<div class="overlay" id="pkgOverlay">
+  <div class="modal">
+    <h3>Manage Packages / Floorplans</h3>
+    <div id="pkgList"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+      <input class="m-input" id="newPkgName" placeholder="New package name…" style="flex:1"/>
+      <button class="btn btn-gold" onclick="addPackage()">Add</button>
+    </div>
+    <div class="m-actions">
+      <button class="btn btn-outline" onclick="closePkgMgr()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="overlay" id="addItemOverlay">
+  <div class="modal">
+    <h3>Add New Item</h3>
+    <label class="m-label">Item Name</label>
+    <input class="m-input" id="newItemName" placeholder="e.g. Backsplash Tile"/>
+    <label class="m-label">Options (comma-separated)</label>
+    <input class="m-input" id="newItemOpts" placeholder="Standard, Premium +$500, Luxury +$1,200"/>
+    <label class="m-label">Flat Upgrade Price ($)</label>
+    <input class="m-input" id="newItemPrice" type="number" placeholder="0"/>
+    <div class="m-actions">
+      <button class="btn btn-outline" onclick="closeAddItem()">Cancel</button>
+      <button class="btn btn-gold" onclick="confirmAddItem()">Add Item</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── SUPABASE ──
+const SUPABASE_URL = 'https://skbkwjqpbhuuwxpxbmhn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYmt3anFwYmh1dXd4cHhibWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTU2NTUsImV4cCI6MjA5MzE3MTY1NX0.OoWqErkV8ri-F2g1ze0SHvM9DackPYHAD0RCJ65RsQA';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── AUTH GUARD ──
+async function checkAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    window.location.href = 'index.html';
+    return false;
+  }
+  document.getElementById('hdrUser').textContent = session.user.email;
+  document.getElementById('authGate').style.display = 'none';
+  return true;
+}
+
+async function signOut(e) {
+  if (e) e.preventDefault();
+  await sb.auth.signOut();
+  window.location.href = 'index.html';
+}
+
+// ── DEFAULT SECTIONS TEMPLATE ──
+function defaultSections() {
+  return [
+    { id: 'appliances', label: 'Appliances', items: [
+      { id: 'a1', name: 'Refrigerator', options: ['Standard (included)', 'French Door +$800', 'Counter-Depth +$1,400'], price: 0, available: true },
+      { id: 'a2', name: 'Range / Oven', options: ['Electric Standard', 'Gas Freestanding +$350', 'Double Oven +$900'], price: 0, available: true },
+      { id: 'a3', name: 'Dishwasher', options: ['Standard', 'Quiet Series +$250', 'Panel-Ready +$600'], price: 0, available: true },
+      { id: 'a4', name: 'Microwave', options: ['Over-Range Standard', 'Built-In +$400', 'Drawer +$900'], price: 0, available: true },
+    ]},
+    { id: 'fixtures', label: 'Fixtures', items: [
+      { id: 'f1', name: 'Kitchen Faucet', options: ['Chrome Standard', 'Brushed Nickel +$120', 'Matte Black +$200', 'Oil-Rubbed Bronze +$180'], price: 0, available: true },
+      { id: 'f2', name: 'Bath Faucets', options: ['Chrome Standard', 'Brushed Nickel +$90', 'Matte Black +$160'], price: 0, available: true },
+      { id: 'f3', name: 'Shower Heads', options: ['Standard', 'Rain Head +$300', 'Body Spray System +$800'], price: 0, available: true },
+      { id: 'f4', name: 'Tub Style', options: ['Alcove Standard', 'Freestanding +$1,200', 'Soaking +$900'], price: 0, available: true },
+    ]},
+    { id: 'kitchen', label: 'Kitchen', items: [
+      { id: 'k1', name: 'Cabinets', options: ['Builder Grade White', 'Shaker White +$1,800', 'Shaker Gray +$2,000', 'Two-Tone +$3,200'], price: 0, available: true },
+      { id: 'k2', name: 'Countertops', options: ['Laminate Standard', 'Quartz +$3,500', 'Granite +$2,800', 'Marble +$5,500'], price: 0, available: true },
+      { id: 'k3', name: 'Floor', options: ['Vinyl Plank', 'Hardwood +$2,200', 'Tile +$1,800'], price: 0, available: true },
+      { id: 'k4', name: 'Backsplash', options: ['None', 'Subway Tile +$600', 'Mosaic +$1,100', 'Full-Height +$2,000'], price: 0, available: true },
+      { id: 'k5', name: 'Island', options: ['None', 'Standard Island +$3,500', 'Waterfall Edge +$5,000'], price: 0, available: true },
+    ]},
+    { id: 'bath', label: 'Bath', items: [
+      { id: 'b1', name: 'Vanity', options: ['Standard', 'Upgraded Single +$600', 'Double Vanity +$1,400'], price: 0, available: true },
+      { id: 'b2', name: 'Tile Surround', options: ['Standard', 'Subway Tile +$500', 'Large Format +$900', 'Full Custom +$2,200'], price: 0, available: true },
+      { id: 'b3', name: 'Mirror / Cabinet', options: ['Flat Mirror', 'Framed Mirror +$200', 'Medicine Cabinet +$450'], price: 0, available: true },
+    ]},
+    { id: 'masterbed', label: 'Master Bed', items: [
+      { id: 'm1', name: 'Closet System', options: ['Wire Shelving', 'Wood System +$1,200', 'Custom Built-In +$3,500'], price: 0, available: true },
+      { id: 'm2', name: 'En-Suite Shower', options: ['Standard', 'Frame-less Glass +$1,500', 'Walk-In Wet Room +$4,000'], price: 0, available: true },
+      { id: 'm3', name: 'Flooring', options: ['Carpet Standard', 'LVP +$1,100', 'Hardwood +$2,400'], price: 0, available: true },
+    ]},
+    { id: 'structure', label: 'Structure', items: [
+      { id: 'st1', name: 'Ceiling Height', options: ['9 ft Standard', '10 ft +$1,500', 'Vaulted +$4,000'], price: 0, available: true },
+      { id: 'st2', name: 'Bonus Room', options: ['None', 'Finished +$18,000', 'Pre-Plumbed Bath +$23,000'], price: 0, available: true },
+      { id: 'st3', name: 'Foundation', options: ['Slab Standard', 'Crawl Space +$8,000', 'Full Basement +$45,000'], price: 0, available: true },
+    ]},
+    { id: 'exterior', label: 'Exterior', items: [
+      { id: 'e1', name: 'Siding', options: ['Vinyl Standard', 'Hardie Plank +$4,500', 'Brick Front +$8,000', 'Full Brick +$22,000'], price: 0, available: true },
+      { id: 'e2', name: 'Roof', options: ['Architectural Shingle', '30-Year +$1,800', 'Metal +$12,000'], price: 0, available: true },
+      { id: 'e3', name: 'Garage Door', options: ['Steel Standard', 'Carriage Style +$900', 'Glass Panel +$2,200'], price: 0, available: true },
+      { id: 'e4', name: 'Deck / Patio', options: ['None', 'Concrete Patio +$3,000', 'Wood Deck +$6,500', 'Composite Deck +$11,000'], price: 0, available: true },
+    ]},
+    { id: 'electrical', label: 'Electrical', items: [
+      { id: 'el1', name: 'Panel Size', options: ['200A Standard', '400A +$1,800'], price: 0, available: true },
+      { id: 'el2', name: 'Lighting Package', options: ['Standard', 'Recessed Upgrade +$1,200', 'Smart Lighting +$3,500'], price: 0, available: true },
+      { id: 'el3', name: 'EV Charger', options: ['None', '240V Outlet +$400', 'Level 2 Charger +$900'], price: 0, available: true },
+      { id: 'el4', name: 'Generator Prep', options: ['None', 'Transfer Switch +$1,500', 'Whole-Home +$8,000'], price: 0, available: true },
+    ]},
+    { id: 'other', label: 'Other', items: [
+      { id: 'o1', name: 'HVAC', options: ['Standard', 'Two-Zone +$3,200', 'Geothermal +$18,000'], price: 0, available: true },
+      { id: 'o2', name: 'Smart Home', options: ['None', 'Basic +$1,200', 'Full Package +$5,500'], price: 0, available: true },
+      { id: 'o3', name: 'Landscaping', options: ['Seed & Straw', 'Sod Front +$2,000', 'Full Sod +$5,500'], price: 0, available: true },
+    ]},
+  ];
+}
+
+// ── STATE ──
+let packages = [], curPkgId = null, activeSec = null, addingToSec = null;
+
+// ── LOAD FROM SUPABASE ──
+async function loadPackages() {
+  const { data, error } = await sb.from('packages').select('id, data');
+  if (error) { toast('Error loading packages: ' + error.message, true); return; }
+  if (data && data.length > 0) {
+    packages = data.map(row => ({ id: row.id, ...row.data }));
+  } else {
+    // Seed default packages on first load
+    const defaults = [
+      { id: 'pkg_1', name: 'Standard Finish', basePrice: 350000, sections: defaultSections() },
+      { id: 'pkg_2', name: 'Premium Finish',  basePrice: 420000, sections: defaultSections() },
+    ];
+    for (const p of defaults) {
+      const { id, ...data } = p;
+      await sb.from('packages').insert({ id, data });
+    }
+    packages = defaults;
+  }
+  curPkgId = packages[0]?.id;
+  activeSec = pkg()?.sections[0]?.id || null;
+  renderAll();
+}
+
+// ── SAVE TO SUPABASE ──
+async function saveAll() {
+  const p = pkg();
+  if (!p) return;
+  const { id, ...data } = p;
+  const { error } = await sb.from('packages').upsert({ id, data, updated_at: new Date().toISOString() });
+  if (error) { toast('Save failed: ' + error.message, true); return; }
+  toast('Package saved to database!');
+}
+
+// ── HELPERS ──
+function pkg() { return packages.find(p => p.id === curPkgId) || packages[0]; }
+function secs() { return pkg()?.sections || []; }
+function curSec() { return secs().find(s => s.id === activeSec) || secs()[0]; }
+function getSection(sid) { return secs().find(s => s.id === sid); }
+function getItem(sid, iid) { return getSection(sid)?.items.find(i => i.id === iid); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function switchPkg() {
+  curPkgId = document.getElementById('pkgSel').value;
+  activeSec = secs()[0]?.id || null;
+  renderAll();
+}
+
+function renderAll() {
+  renderPkgSel();
+  renderSidebar();
+  renderMobNav();
+  renderMain();
+}
+
+function renderPkgSel() {
+  const el = document.getElementById('pkgSel');
+  el.innerHTML = packages.map(p =>
+    `<option value="${p.id}"${p.id === curPkgId ? ' selected' : ''}>${p.name}</option>`
+  ).join('');
+}
+
+function renderSidebar() {
+  const sb2 = document.getElementById('sidebar');
+  sb2.querySelectorAll('.sb-tab').forEach(e => e.remove());
+  const addBtn = sb2.querySelector('.sb-add');
+  secs().forEach(sec => {
+    const d = document.createElement('div');
+    d.className = 'sb-tab' + (sec.id === activeSec ? ' active' : '');
+    d.innerHTML = `<span>${sec.label}</span><span class="sb-cnt">${sec.items.length}</span>`;
+    d.onclick = () => { activeSec = sec.id; renderAll(); };
+    sb2.insertBefore(d, addBtn);
+  });
+}
+
+function renderMobNav() {
+  const inner = document.getElementById('mobNavInner');
+  inner.innerHTML = '';
+  secs().forEach(sec => {
+    const d = document.createElement('div');
+    d.className = 'mob-tab' + (sec.id === activeSec ? ' active' : '');
+    d.textContent = sec.label;
+    d.onclick = () => { activeSec = sec.id; renderAll(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    inner.appendChild(d);
+  });
+  setTimeout(() => {
+    const a = inner.querySelector('.mob-tab.active');
+    if (a) a.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }, 60);
+}
+
+function renderMain() {
+  const sec = curSec();
+  const area = document.getElementById('mainArea');
+  if (!sec) { area.innerHTML = '<p style="padding:40px;color:var(--muted)">No sections. Add one from the sidebar.</p>'; return; }
+  const p = pkg();
+  area.innerHTML = `
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-title">${sec.label}</div>
+        <div class="sec-meta">${sec.items.length} item${sec.items.length !== 1 ? 's' : ''} · toggle Available to show/hide on Selection Page</div>
+      </div>
+      <div class="sec-actions">
+        <button class="btn btn-red-o" onclick="deleteSection('${sec.id}')">✕ Remove Category</button>
+        <button class="btn btn-gold" onclick="openAddItem('${sec.id}')">+ Add Item</button>
+      </div>
+    </div>
+    <div class="base-price-row">
+      <label>Base Price ($)</label>
+      <input class="base-price-input" type="number" value="${p.basePrice}" onchange="pkg().basePrice = parseFloat(this.value)||0"/>
+      <div class="pkg-name-display">Package: <strong>${p.name}</strong></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:180px">Item Name</th>
+          <th>Dropdown Options</th>
+          <th style="width:92px">Flat Price</th>
+          <th style="width:76px">Available</th>
+          <th style="width:52px">Del</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>`;
+  const tbody = document.getElementById('tbody');
+  sec.items.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.id = 'row_' + item.id;
+    tr.innerHTML = buildRow(sec.id, item);
+    tbody.appendChild(tr);
+  });
+}
+
+function buildRow(secId, item) {
+  const chipsHtml = item.options.map((o, oi) =>
+    `<span class="chip">${escHtml(o)}<button class="del-chip" onclick="removeOpt('${secId}','${item.id}',${oi})">×</button></span>`
+  ).join('');
+  const avail = item.available !== false ? 'checked' : '';
+  return `
+    <td><input class="e-input" value="${escHtml(item.name)}" onchange="updateItem('${secId}','${item.id}','name',this.value)"/></td>
+    <td><div class="chips" id="chips_${item.id}">
+      ${chipsHtml}
+      <input class="chip-add" placeholder="+ Add, Enter" onkeydown="addChip(event,'${secId}','${item.id}',this)"/>
+    </div></td>
+    <td><input class="e-input e-price" type="number" value="${item.price||0}" onchange="updateItem('${secId}','${item.id}','price',parseFloat(this.value)||0)"/></td>
+    <td><label class="tog">
+      <input type="checkbox" ${avail} onchange="updateItem('${secId}','${item.id}','available',this.checked)"/>
+      <div class="tog-track"></div><div class="tog-thumb"></div>
+    </label></td>
+    <td><button class="btn btn-red" style="padding:4px 8px;font-size:.7rem" onclick="removeItem('${secId}','${item.id}')">✕</button></td>`;
+}
+
+function updateItem(secId, itemId, field, val) {
+  const item = getItem(secId, itemId);
+  if (item) item[field] = val;
+}
+function removeOpt(secId, itemId, oi) {
+  const item = getItem(secId, itemId);
+  if (!item || item.options.length <= 1) { toast('At least one option required', true); return; }
+  item.options.splice(oi, 1); renderMain();
+}
+function addChip(e, secId, itemId, input) {
+  if (e.key !== 'Enter') return;
+  const val = input.value.trim(); if (!val) return;
+  const item = getItem(secId, itemId);
+  if (item) { item.options.push(val); input.value = ''; renderMain(); }
+}
+function removeItem(secId, itemId) {
+  const sec = getSection(secId); if (!sec) return;
+  sec.items = sec.items.filter(i => i.id !== itemId);
+  renderMain(); renderSidebar(); renderMobNav();
+}
+
+function openAddItem(secId) {
+  addingToSec = secId;
+  ['newItemName','newItemOpts','newItemPrice'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('addItemOverlay').classList.add('open');
+}
+function closeAddItem() { document.getElementById('addItemOverlay').classList.remove('open'); }
+function confirmAddItem() {
+  const name = document.getElementById('newItemName').value.trim() || 'New Item';
+  const opts = document.getElementById('newItemOpts').value.split(',').map(s => s.trim()).filter(Boolean);
+  const price = parseFloat(document.getElementById('newItemPrice').value) || 0;
+  const sec = getSection(addingToSec); if (!sec) { closeAddItem(); return; }
+  sec.items.push({ id: 'i' + Date.now(), name, options: opts.length ? opts : ['Standard'], price, available: true });
+  closeAddItem(); renderAll(); toast('Item added');
+}
+
+function addSection() {
+  const name = prompt('New category name:');
+  if (!name?.trim()) return;
+  const id = 'sec_' + Date.now();
+  pkg().sections.push({ id, label: name.trim(), items: [] });
+  activeSec = id; renderAll(); toast('Category added');
+}
+function deleteSection(secId) {
+  if (!confirm('Delete this category and all its items?')) return;
+  const p = pkg(); p.sections = p.sections.filter(s => s.id !== secId);
+  activeSec = p.sections[0]?.id || null; renderAll();
+}
+
+// ── PACKAGE MANAGER ──
+function openPkgMgr() { renderPkgList(); document.getElementById('pkgOverlay').classList.add('open'); }
+function closePkgMgr() { document.getElementById('pkgOverlay').classList.remove('open'); }
+function renderPkgList() {
+  document.getElementById('pkgList').innerHTML = packages.map(p => `
+    <div class="pkg-row">
+      <input class="pkg-name-e" value="${escHtml(p.name)}" onchange="renamePkg('${p.id}',this.value)"/>
+      <span style="font-size:.72rem;color:var(--muted)">$</span>
+      <input class="pkg-base-e" type="number" value="${p.basePrice}" onchange="setPkgBase('${p.id}',this.value)"/>
+      <button class="btn btn-outline" style="font-size:.68rem;padding:4px 8px" onclick="dupPkg('${p.id}')">Copy</button>
+      ${packages.length > 1 ? `<button class="btn btn-red-o" style="font-size:.68rem;padding:4px 8px" onclick="delPkg('${p.id}')">✕</button>` : ''}
+    </div>`).join('');
+}
+function renamePkg(id, val) { const p = packages.find(x => x.id === id); if (p) { p.name = val; renderPkgSel(); } }
+function setPkgBase(id, val) { const p = packages.find(x => x.id === id); if (p) p.basePrice = parseFloat(val) || 0; }
+async function addPackage() {
+  const name = document.getElementById('newPkgName').value.trim(); if (!name) return;
+  const id = 'pkg_' + Date.now();
+  const newPkg = { id, name, basePrice: 350000, sections: defaultSections() };
+  const { error } = await sb.from('packages').insert({ id, data: { name, basePrice: newPkg.basePrice, sections: newPkg.sections } });
+  if (error) { toast('Error: ' + error.message, true); return; }
+  packages.push(newPkg);
+  document.getElementById('newPkgName').value = '';
+  renderPkgList(); renderPkgSel(); toast('Package created and saved');
+}
+async function dupPkg(id) {
+  const orig = packages.find(p => p.id === id); if (!orig) return;
+  const clone = JSON.parse(JSON.stringify(orig));
+  clone.id = 'pkg_' + Date.now(); clone.name = orig.name + ' (Copy)';
+  const { id: cid, ...cdata } = clone;
+  const { error } = await sb.from('packages').insert({ id: cid, data: cdata });
+  if (error) { toast('Error: ' + error.message, true); return; }
+  packages.push(clone); renderPkgList(); renderPkgSel(); toast('Package duplicated');
+}
+async function delPkg(id) {
+  if (!confirm('Delete this package from the database?')) return;
+  const { error } = await sb.from('packages').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message, true); return; }
+  packages = packages.filter(p => p.id !== id);
+  if (curPkgId === id) curPkgId = packages[0]?.id;
+  renderPkgList(); renderPkgSel(); renderAll(); toast('Package deleted');
+}
+
+function toast(msg, isErr) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderLeftColor = isErr ? '#c0392b' : '#c8a840';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+document.querySelectorAll('.overlay').forEach(el =>
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); })
+);
+
+// ── INIT ──
+async function init() {
+  const ok = await checkAuth();
+  if (ok) await loadPackages();
+}
+init();
+</script>
+</body>
+</html>

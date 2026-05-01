@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BuilderSelect — Sign In</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --dark:    #0e0c09;
+  --dark2:   #161310;
+  --surface: #1e1a14;
+  --border:  #2e2820;
+  --gold:    #c8a840;
+  --gold2:   #e8c860;
+  --muted:   #6a6050;
+  --text:    #e8e0d0;
+  --text2:   #a89880;
+  --red:     #c0392b;
+  --green:   #2d7d4e;
+}
+
+body {
+  background: var(--dark);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(200,168,64,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,168,64,.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* Gold glow orb */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(200,168,64,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 44px 40px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(200,168,64,.05);
+}
+
+/* Top gold accent line */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius: 1px;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.brand-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+.brand-sub {
+  font-size: .6rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.brand-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 16px auto 0;
+}
+
+.form-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-size: .62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+.field input {
+  width: 100%;
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .92rem;
+  padding: 12px 14px;
+  transition: border-color .2s, box-shadow .2s;
+  outline: none;
+  -webkit-appearance: none;
+}
+.field input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(200,168,64,.08);
+}
+.field input::placeholder { color: var(--muted); }
+
+/* Password wrapper for show/hide */
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 44px; }
+.pw-toggle {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: .78rem;
+  letter-spacing: .5px;
+  padding: 4px;
+  transition: color .15s;
+}
+.pw-toggle:hover { color: var(--gold); }
+
+.btn-submit {
+  width: 100%;
+  background: var(--gold);
+  border: none;
+  border-radius: 8px;
+  color: #1a1200;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  padding: 13px;
+  margin-top: 8px;
+  transition: background .18s, transform .12s, box-shadow .18s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-submit:hover {
+  background: var(--gold2);
+  box-shadow: 0 4px 20px rgba(200,168,64,.25);
+}
+.btn-submit:active { transform: scale(.98); }
+.btn-submit:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Spinner inside button */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0,0,0,.2);
+  border-top-color: #1a1200;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.msg {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 7px;
+  font-size: .82rem;
+  text-align: center;
+  display: none;
+}
+.msg.error { background: rgba(192,57,43,.12); border: 1px solid rgba(192,57,43,.3); color: #e57869; display: block; }
+.msg.success { background: rgba(45,125,78,.12); border: 1px solid rgba(45,125,78,.3); color: #5dba85; display: block; }
+
+.footer-note {
+  text-align: center;
+  margin-top: 28px;
+  font-size: .68rem;
+  color: var(--muted);
+  letter-spacing: .5px;
+}
+
+/* Logged-in state */
+.logged-in-card { display: none; text-align: center; }
+.logged-in-card .greeting {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.logged-in-card .user-email {
+  font-size: .78rem;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.nav-buttons { display: flex; flex-direction: column; gap: 10px; }
+.nav-btn {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  text-decoration: none;
+  transition: all .18s;
+  text-align: left;
+}
+.nav-btn:hover { border-color: var(--gold); background: rgba(200,168,64,.05); }
+.nav-btn-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+.nav-btn-desc { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+.btn-logout {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .76rem;
+  padding: 8px 16px;
+  margin-top: 20px;
+  transition: all .15s;
+}
+.btn-logout:hover { border-color: var(--red); color: #e57869; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .card { padding: 36px 24px 30px; }
+  .brand-logo { font-size: 1.9rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="card" id="loginCard">
+  <div class="brand">
+    <div class="brand-logo">BuilderSelect</div>
+    <div class="brand-sub">Selection Management System</div>
+    <div class="brand-divider"></div>
+  </div>
+
+  <div class="form-title">Staff Sign In</div>
+
+  <div class="field">
+    <label>Email Address</label>
+    <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email"/>
+  </div>
+
+  <div class="field">
+    <label>Password</label>
+    <div class="pw-wrap">
+      <input type="password" id="passInput" placeholder="••••••••" autocomplete="current-password"/>
+      <button class="pw-toggle" type="button" onclick="togglePw()" id="pwToggle">Show</button>
+    </div>
+  </div>
+
+  <button class="btn-submit" id="submitBtn" onclick="signIn()">Sign In</button>
+  <div class="msg" id="msg"></div>
+
+  <div class="footer-note">Access restricted to authorized staff only</div>
+</div>
+
+<!-- Shown after login -->
+<div class="card logged-in-card" id="loggedInCard">
+  <div class="brand">
+    <div class="brand-logo">BuilderSelect</div>
+    <div class="brand-sub">Selection Management System</div>
+    <div class="brand-divider"></div>
+  </div>
+  <div class="greeting" id="greeting">Welcome back</div>
+  <div class="user-email" id="userEmail"></div>
+  <div class="nav-buttons">
+    <a href="PackageBuilder.html" class="nav-btn">
+      <div class="nav-btn-title">Package Builder</div>
+      <div class="nav-btn-desc">Create and manage master selection files</div>
+    </a>
+    <a href="SelectionPage.html" class="nav-btn">
+      <div class="nav-btn-title">Selection Page</div>
+      <div class="nav-btn-desc">Walk through selections with a customer</div>
+    </a>
+  </div>
+  <button class="btn-logout" onclick="signOut()">Sign Out</button>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://skbkwjqpbhuuwxpxbmhn.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYmt3anFwYmh1dXd4cHhibWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTU2NTUsImV4cCI6MjA5MzE3MTY1NX0.OoWqErkV8ri-F2g1ze0SHvM9DackPYHAD0RCJ65RsQA';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── CHECK SESSION ON LOAD ──
+async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) showLoggedIn(session.user);
+}
+
+// ── SIGN IN ──
+async function signIn() {
+  const email = document.getElementById('emailInput').value.trim().toLowerCase();
+  const pass  = document.getElementById('passInput').value;
+  const btn   = document.getElementById('submitBtn');
+  const msg   = document.getElementById('msg');
+
+  msg.className = 'msg';
+  msg.textContent = '';
+
+  if (!email || !pass) {
+    showMsg('Please enter your email and password.', 'error');
+    return;
+  }
+
+  // Loading state
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Signing in…';
+
+  // Sign in with Supabase Auth only
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    showMsg('Incorrect email or password. Please try again.', 'error');
+    resetBtn();
+    return;
+  }
+
+  // Success
+  showLoggedIn(data.user);
+  resetBtn();
+}
+
+// ── SIGN OUT ──
+async function signOut() {
+  await sb.auth.signOut();
+  document.getElementById('loggedInCard').style.display = 'none';
+  document.getElementById('loginCard').style.display = 'block';
+  document.getElementById('emailInput').value = '';
+  document.getElementById('passInput').value = '';
+}
+
+// ── SHOW LOGGED IN STATE ──
+function showLoggedIn(user) {
+  document.getElementById('loginCard').style.display = 'none';
+  const card = document.getElementById('loggedInCard');
+  card.style.display = 'block';
+  document.getElementById('userEmail').textContent = user.email;
+  const name = user.email.split('@')[0];
+  document.getElementById('greeting').textContent = 'Welcome, ' + name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+// ── HELPERS ──
+function showMsg(text, type) {
+  const msg = document.getElementById('msg');
+  msg.textContent = text;
+  msg.className = 'msg ' + type;
+}
+
+function resetBtn() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = false;
+  btn.innerHTML = 'Sign In';
+}
+
+function togglePw() {
+  const input  = document.getElementById('passInput');
+  const toggle = document.getElementById('pwToggle');
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  toggle.textContent = isHidden ? 'Hide' : 'Show';
+}
+
+// Allow Enter key to submit
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') signIn();
+});
+
+checkSession();
+</script>
+</body>
+</html>
