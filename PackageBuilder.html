@@ -318,6 +318,44 @@ async function signOut(e) {
 }
 
 
+function standardSections() {
+  const mk = (label, items) => ({ id: 'sec_' + label.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Math.random().toString(36).slice(2,6), label, items });
+  const item = (name) => ({ id: 'i' + Math.random().toString(36).slice(2,10), name, options: ['Standard'], price: 0, available: true });
+  return [
+    mk('Exterior', [
+      'Roof','Brick/Stone','Garage Door','Front Siding','Side and Rear Siding','Siding Gables','Exterior Trim',
+      'Louvered Vent/Gable Brackets','Gutters','Shutters','Windows','Front Door','Sidelights','Porch Post',
+      'Porch Rails','Rear Door','Service Door','Patio','Driveway Pad','Outdoor Lighting','Landscaping',
+      'Insulate/Drywall Garage Walls'
+    ].map(item)),
+    mk('Plumbing', ['Water Heater','Water Softener','Commodes','Extra Gas Lines','Fixture Color'].map(item)),
+    mk('HVAC', ['Furnace','Air Conditioner','Vented Range Hood','Humidifier'].map(item)),
+    mk('Electrical', ['Recessed Can Lights','Pendant Lights','Extra Outlets'].map(item)),
+    mk('Kitchen', [
+      'Kitchen Cabinets','Kitchen Island Cabinets','Cabinet Lighting','Kitchen Island','Kitchen Cabinet Hardware',
+      'Kitchen Sink','Kitchen Faucet','Kitchen Counter Top','Backsplash','Install'
+    ].map(item)),
+    mk('Appliances', ['Range','Vented Range Hood','Dishwasher','Microwave','Refrigerator'].map(item)),
+    mk('Bathrooms', [
+      'Primary Bath Vanity Cabinets','Primary Vanity Top','Primary Shower','Primary Shower Door','Primary Bath Tub',
+      'Primary Shower Upgrades','Hall Bath Tub','Hall Vanity Cabinets','Hall Bath Vanity Tops','Bath Cabinet Hardware',
+      'Half Bath Sink','Basement Bath Rough','Basement Bath Tub/Shower','Basement Vanity Cabinets',
+      'Basement Vanity Top','Basement Cabinet Handles'
+    ].map(item)),
+    mk('Fireplace', ['Fireplace','Fireplace Hearth','Fireplace Surround','Fireplace Mantel','Eyeball Lights'].map(item)),
+    mk('Drywall/Paint', ['Paint Color','Trim & Door Paint','Ceilings'].map(item)),
+    mk('Trim', [
+      'Knob & Hinges','Interior Doors','Stair Handrails (Basement to First)','Stair Handrails (First to Second)',
+      'Half Walls','Interior Trim','Interior Trim Options'
+    ].map(item)),
+    mk('Lighting', ['Lighting Fixture Color','Fan Location #1','Fan Location #2','Additional Fan'].map(item)),
+    mk('Flooring', [
+      'Family Room','Great Room','Dining Room/Study','Primary Bedroom','Bedroom 2/3/4','All Bedroom Closets',
+      'Basement','Basement Stairs','Second Floor Stairs'
+    ].map(item)),
+  ];
+}
+
 let packages = [], curPkgId = null, activeSec = null, addingToSec = null;
 
 async function loadPackages() {
@@ -396,9 +434,7 @@ function renderMain() {
       </div>
     </div>
     <div class="base-price-row">
-      <label>Base Price ($)</label>
-      <input class="base-price-input" type="number" value="${p.basePrice}" onchange="pkg().basePrice = parseFloat(this.value)||0"/>
-      <div class="pkg-name-display">Package: <strong>${p.name}</strong></div>
+      <div class="pkg-name-display">Package: <strong>${p.name}</strong> · Base price is set per sale on the Selection Page</div>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -451,9 +487,7 @@ function closePkgMgr() { document.getElementById('pkgOverlay').classList.remove(
 function renderPkgList() {
   document.getElementById('pkgList').innerHTML = packages.map(p => `
     <div class="pkg-row">
-      <input class="pkg-name-e" value="${escHtml(p.name)}" onchange="renamePkg('${p.id}',this.value)"/>
-      <span style="font-size:.72rem;color:var(--muted)">$</span>
-      <input class="pkg-base-e" type="number" value="${p.basePrice}" onchange="setPkgBase('${p.id}',this.value)"/>
+      <input class="pkg-name-e" value="${escHtml(p.name)}" onchange="renamePkg('${p.id}',this.value)" placeholder="Package name"/>
       <button class="btn btn-outline" style="font-size:.68rem;padding:4px 8px" onclick="dupPkg('${p.id}')">Copy</button>
       ${packages.length > 1 ? `<button class="btn btn-outline-red" style="font-size:.68rem;padding:4px 8px" onclick="delPkg('${p.id}')">✕</button>` : ''}
     </div>`).join('');
@@ -463,17 +497,19 @@ function setPkgBase(id, val) { const p = packages.find(x => x.id === id); if (p)
 async function addPackage() {
   const name = document.getElementById('newPkgName').value.trim(); if (!name) return;
   const id = 'pkg_' + Date.now();
-  const newPkg = { id, name, basePrice: 0, sections: [] };
-  const { error } = await sb.from('packages').insert({ id, data: { name, basePrice: 0, sections: [] } });
+  const sections = standardSections();
+  const newPkg = { id, name, sections };
+  const { error } = await sb.from('packages').insert({ id, data: { name, sections } });
   if (error) { toast('Error: ' + error.message, true); return; }
   packages.push(newPkg); document.getElementById('newPkgName').value = '';
-  curPkgId = id; activeSec = null;
-  renderPkgList(); renderPkgSel(); renderAll(); toast('Package created — ready to build');
+  curPkgId = id; activeSec = sections[0]?.id || null;
+  renderPkgList(); renderPkgSel(); renderAll(); toast('Package created with standard categories');
 }
 async function dupPkg(id) {
   const orig = packages.find(p => p.id === id); if (!orig) return;
   const clone = JSON.parse(JSON.stringify(orig));
   clone.id = 'pkg_' + Date.now(); clone.name = orig.name + ' (Copy)';
+  delete clone.basePrice;
   const { id: cid, ...cdata } = clone;
   const { error } = await sb.from('packages').insert({ id: cid, data: cdata });
   if (error) { toast('Error: ' + error.message, true); return; }
