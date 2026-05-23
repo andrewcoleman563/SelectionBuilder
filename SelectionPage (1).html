@@ -553,6 +553,89 @@ body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: 
   </div>
 </div>
 
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importOverlay">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-title">Import Saved Selection</div>
+      <button class="modal-close" onclick="closeImport()">✕</button>
+    </div>
+    <div class="filter-row">
+      <input class="filter-input" id="filterName" placeholder="Filter by Customer..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterAddress" placeholder="Filter by Address..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterAgent" placeholder="Filter by Agent..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterDate" type="date" oninput="filterTable()" title="Filter by Date"/>
+    </div>
+    <div class="sel-table-wrap">
+      <table class="sel-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Address</th>
+            <th>Agent</th>
+            <th>Date</th>
+            <th>Saved</th>
+          </tr>
+        </thead>
+        <tbody id="importTbody"></tbody>
+      </table>
+    </div>
+    <div class="import-actions">
+      <button class="btn-modal btn-modal-outline" onclick="closeImport()">Cancel</button>
+      <button class="btn-modal btn-modal-red" onclick="confirmImport()">Load Selection</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- GALLERY FLOATING BUTTON -->
+<button class="gallery-btn" onclick="openGallery()">📖 Selection Gallery</button>
+
+<!-- GALLERY BACKDROP + SIDEBAR -->
+<div class="gallery-backdrop" id="galleryBackdrop" onclick="closeGallery()"></div>
+<div class="gallery-panel" id="galleryPanel">
+  <div class="gallery-hdr">
+    <div class="gallery-title">Selection <span>Gallery</span></div>
+    <button class="gallery-close" onclick="closeGallery()" title="Close">✕</button>
+  </div>
+  <div class="gallery-body">
+    <iframe src="gallery.pdf#toolbar=0&view=FitH" title="Selection Gallery"></iframe>
+  </div>
+</div>
+
+<!-- ELEVATION + BASE PRICE PROMPT -->
+<div class="prompt-overlay" id="elevPromptOverlay">
+  <div class="prompt-box">
+    <div class="prompt-title">Package Setup</div>
+    <div class="prompt-sub" id="elevPromptSub">Choose elevation and enter starting price</div>
+
+    <div class="prompt-section">
+      <div class="prompt-label">Elevation</div>
+      <div class="prompt-elev-group">
+        <button class="prompt-elev" data-elev="A" onclick="pickElev('A')">A</button>
+        <button class="prompt-elev" data-elev="B" onclick="pickElev('B')">B</button>
+        <button class="prompt-elev" data-elev="C" onclick="pickElev('C')">C</button>
+        <button class="prompt-elev" data-elev="D" onclick="pickElev('D')">D</button>
+      </div>
+    </div>
+
+    <div class="prompt-section">
+      <div class="prompt-label">Starting Base Price ($)</div>
+      <input class="prompt-price-input" type="number" id="elevPromptPrice" placeholder="0" min="0"/>
+    </div>
+
+    <div class="prompt-actions">
+      <button class="prompt-btn prompt-btn-outline" onclick="cancelElevPrompt()">Cancel</button>
+      <button class="prompt-btn prompt-btn-red" onclick="confirmElevPrompt()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
 <script>
 const SUPABASE_URL = 'https://skbkwjqpbhuuwxpxbmhn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYmt3anFwYmh1dXd4cHhibWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTU2NTUsImV4cCI6MjA5MzE3MTY1NX0.OoWqErkV8ri-F2g1ze0SHvM9DackPYHAD0RCJ65RsQA';
@@ -1124,87 +1207,5 @@ async function init() {
 }
 init();
 </script>
-
-<!-- IMPORT MODAL -->
-<div class="modal-overlay" id="importOverlay">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">Import Saved Selection</div>
-      <button class="modal-close" onclick="closeImport()">✕</button>
-    </div>
-    <div class="filter-row">
-      <input class="filter-input" id="filterName" placeholder="Filter by Customer..." oninput="filterTable()"/>
-      <input class="filter-input" id="filterAddress" placeholder="Filter by Address..." oninput="filterTable()"/>
-      <input class="filter-input" id="filterAgent" placeholder="Filter by Agent..." oninput="filterTable()"/>
-      <input class="filter-input" id="filterDate" type="date" oninput="filterTable()" title="Filter by Date"/>
-    </div>
-    <div class="sel-table-wrap">
-      <table class="sel-table">
-        <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Address</th>
-            <th>Agent</th>
-            <th>Date</th>
-            <th>Saved</th>
-          </tr>
-        </thead>
-        <tbody id="importTbody"></tbody>
-      </table>
-    </div>
-    <div class="import-actions">
-      <button class="btn-modal btn-modal-outline" onclick="closeImport()">Cancel</button>
-      <button class="btn-modal btn-modal-red" onclick="confirmImport()">Load Selection</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- GALLERY FLOATING BUTTON -->
-<button class="gallery-btn" onclick="openGallery()">📖 Selection Gallery</button>
-
-<!-- GALLERY BACKDROP + SIDEBAR -->
-<div class="gallery-backdrop" id="galleryBackdrop" onclick="closeGallery()"></div>
-<div class="gallery-panel" id="galleryPanel">
-  <div class="gallery-hdr">
-    <div class="gallery-title">Selection <span>Gallery</span></div>
-    <button class="gallery-close" onclick="closeGallery()" title="Close">✕</button>
-  </div>
-  <div class="gallery-body">
-    <iframe src="gallery.pdf#toolbar=0&view=FitH" title="Selection Gallery"></iframe>
-  </div>
-</div>
-
-<!-- ELEVATION + BASE PRICE PROMPT -->
-<div class="prompt-overlay" id="elevPromptOverlay">
-  <div class="prompt-box">
-    <div class="prompt-title">Package Setup</div>
-    <div class="prompt-sub" id="elevPromptSub">Choose elevation and enter starting price</div>
-
-    <div class="prompt-section">
-      <div class="prompt-label">Elevation</div>
-      <div class="prompt-elev-group">
-        <button class="prompt-elev" data-elev="A" onclick="pickElev('A')">A</button>
-        <button class="prompt-elev" data-elev="B" onclick="pickElev('B')">B</button>
-        <button class="prompt-elev" data-elev="C" onclick="pickElev('C')">C</button>
-        <button class="prompt-elev" data-elev="D" onclick="pickElev('D')">D</button>
-      </div>
-    </div>
-
-    <div class="prompt-section">
-      <div class="prompt-label">Starting Base Price ($)</div>
-      <input class="prompt-price-input" type="number" id="elevPromptPrice" placeholder="0" min="0"/>
-    </div>
-
-    <div class="prompt-actions">
-      <button class="prompt-btn prompt-btn-outline" onclick="cancelElevPrompt()">Cancel</button>
-      <button class="prompt-btn prompt-btn-red" onclick="confirmElevPrompt()">Confirm</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
 </body>
 </html>
