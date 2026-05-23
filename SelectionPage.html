@@ -656,17 +656,14 @@ async function loadPackages() {
   const { data, error } = await sb.from('packages').select('id, data');
   if (error || !data?.length) { document.getElementById('mainScroll').innerHTML = '<p style="padding:40px;color:var(--muted)">No packages found. Create them in Package Builder first.</p>'; return; }
   packages = data.map(row => ({ id: row.id, ...row.data }));
-  curPkgId = packages[0]?.id;
-  activeSec = visSecs()[0]?.id || null;
+  // Start with no package selected — user must pick one
+  curPkgId = null;
+  activeSec = null;
   document.getElementById('custDate').value = new Date().toISOString().split('T')[0];
   renderAll();
-  // On initial load, prompt for elevation + base price for the first package
-  if (curPkgId && !pkgElevation[curPkgId]) {
-    setTimeout(() => showElevPrompt(curPkgId), 250);
-  }
 }
 
-function pkg() { return packages.find(p => p.id === curPkgId) || packages[0]; }
+function pkg() { return curPkgId ? packages.find(p => p.id === curPkgId) : null; }
 function visSecs() { return (pkg()?.sections || []).map(s => ({ ...s, items: (s.items || []).filter(i => i.available !== false) })).filter(s => s.items.length > 0); }
 function curSec() { return visSecs().find(s => s.id === activeSec) || visSecs()[0]; }
 function getItem(sid, iid) { return visSecs().find(s => s.id === sid)?.items.find(i => i.id === iid); }
@@ -678,10 +675,11 @@ function setSel(iid, data) { if (!selections[curPkgId]) selections[curPkgId] = {
 
 function switchPkg() {
   const newId = document.getElementById('pkgSel').value;
+  if (!newId) { return; } // placeholder selected, ignore
   curPkgId = newId;
   activeSec = visSecs()[0]?.id || null;
   renderAll();
-  // Prompt for elevation+price if not yet set for this package
+  // Only prompt if elevation hasn't been set yet for this package
   if (!pkgElevation[newId]) showElevPrompt(newId);
 }
 
@@ -689,7 +687,8 @@ function renderAll() { renderPkgSel(); renderSidebar(); renderMobNav(); renderMa
 
 function renderPkgSel() {
   const el = document.getElementById('pkgSel');
-  el.innerHTML = packages.map(p => `<option value="${p.id}"${p.id === curPkgId ? ' selected' : ''}>${p.name}</option>`).join('');
+  const placeholder = '<option value=""' + (!curPkgId ? ' selected' : '') + ' disabled>Select a package...</option>';
+  el.innerHTML = placeholder + packages.map(p => `<option value="${p.id}"${p.id === curPkgId ? ' selected' : ''}>${p.name}</option>`).join('');
   const elev = pkgElevation[curPkgId];
   const hdrEl = document.getElementById('hdrPkg');
   hdrEl.innerHTML = (pkg()?.name || '—') + (elev ? ' <span class="hdr-elev-badge">ELEV ' + elev + '</span>' : '');
@@ -729,7 +728,18 @@ function renderMobNav() {
 }
 
 function renderMain() {
-  const sec = curSec(); const el = document.getElementById('mainScroll');
+  const el = document.getElementById('mainScroll');
+  // No package selected → show empty state
+  if (!curPkgId) {
+    el.innerHTML = `
+      <div style="padding:80px 24px;text-align:center;color:var(--muted)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:3px;color:#ddd;line-height:1;margin-bottom:14px">📦</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;color:#999;margin-bottom:10px">Select a Package to Continue</div>
+        <div style="font-size:.9rem;color:var(--muted);max-width:380px;margin:0 auto">Use the <strong style="color:var(--red)">Package dropdown</strong> in the top bar to choose which finish package you're configuring for this customer.</div>
+      </div>`;
+    return;
+  }
+  const sec = curSec();
   if (!sec) { el.innerHTML = '<p style="padding:40px;color:var(--muted)">Select a category.</p>'; return; }
   const ps = selections[curPkgId] || {};
   const selCnt = sec.items.filter(i => ps[i.id]?.selected).length;
@@ -954,14 +964,11 @@ function pickElev(letter) {
 
 function cancelElevPrompt() {
   document.getElementById('elevPromptOverlay').classList.remove('open');
-  // If user cancels and there's no prior setup for this package, fall back to first package
+  // If user cancels and there's no elevation set for this package, deselect it
   if (pendingPkgId && !pkgElevation[pendingPkgId]) {
-    // Reset selector to a package that's already set up, or stay with no setup
-    const firstSetup = packages.find(p => pkgElevation[p.id]);
-    if (firstSetup) {
-      curPkgId = firstSetup.id;
-      document.getElementById('pkgSel').value = curPkgId;
-    }
+    curPkgId = null;
+    activeSec = null;
+    renderAll();
   }
   pendingPkgId = null;
   pendingElevChoice = null;
