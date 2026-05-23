@@ -252,6 +252,231 @@ body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: 
 /* Toast */
 .toast { position: fixed; bottom: 20px; right: 20px; background: var(--black); color: var(--white); border-left: 4px solid var(--red); border-radius: 3px; padding: 10px 16px; font-size: .8rem; z-index: 999; opacity: 0; transform: translateY(8px); transition: all .25s; pointer-events: none; max-width: 300px; }
 .toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── GALLERY BUTTON (right-side floating) ── */
+.gallery-btn {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: bottom right;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: .95rem;
+  letter-spacing: 2px;
+  padding: 10px 18px;
+  cursor: pointer;
+  z-index: 250;
+  border-radius: 4px 4px 0 0;
+  box-shadow: -2px -2px 12px rgba(0,0,0,.15);
+  transition: background .14s;
+}
+.gallery-btn:hover { background: var(--red-dark); }
+
+/* ── GALLERY SIDEBAR ── */
+.gallery-panel {
+  position: fixed;
+  top: 0; right: 0;
+  width: 720px; max-width: 95vw;
+  height: 100vh;
+  background: var(--white);
+  box-shadow: -4px 0 32px rgba(0,0,0,.25);
+  z-index: 400;
+  transform: translateX(100%);
+  transition: transform .28s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+.gallery-panel.open { transform: translateX(0); }
+.gallery-hdr {
+  background: var(--black);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 3px solid var(--red);
+  flex-shrink: 0;
+}
+.gallery-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--white); letter-spacing: 3px; }
+.gallery-title span { color: var(--red); }
+.gallery-close {
+  background: transparent;
+  border: 1px solid #333;
+  color: #ccc;
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: 32px; height: 32px;
+  border-radius: 3px;
+  transition: all .14s;
+}
+.gallery-close:hover { border-color: var(--red); color: var(--red); }
+.gallery-body { flex: 1; overflow: hidden; }
+.gallery-body iframe { width: 100%; height: 100%; border: none; }
+.gallery-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 380;
+  display: none;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.gallery-backdrop.open { display: block; opacity: 1; }
+
+/* ── ELEVATION ROW ── */
+.elev-row {
+  display: flex; gap: 6px; flex-shrink: 0; align-items: center;
+  padding: 0 2px;
+}
+.elev-row .ilabel { font-size: .56rem; }
+.elev-btn-group { display: flex; gap: 3px; }
+.elev-btn {
+  background: var(--off-white);
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  transition: all .14s;
+  letter-spacing: .5px;
+}
+.elev-btn:hover { border-color: var(--red); color: var(--red); }
+.elev-btn.on { background: var(--red); border-color: var(--red); color: var(--white); }
+
+/* ── SIDING COLOR BOX ── */
+.siding-color-wrap {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #fff8f5;
+  border: 1.5px solid #f5c2cb;
+  border-radius: 3px;
+}
+.siding-color-wrap.filled {
+  background: var(--green-light);
+  border-color: #a3d4b5;
+}
+.siding-color-label {
+  font-size: .58rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.siding-color-wrap.filled .siding-color-label { color: var(--green); }
+.siding-color-input {
+  width: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  padding: 5px 8px;
+}
+.siding-color-input:focus { outline: none; border-color: var(--red); }
+
+/* ── PROMPT MODAL ── */
+.prompt-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.prompt-overlay.open { display: flex; }
+.prompt-box {
+  background: var(--white);
+  border-top: 4px solid var(--red);
+  border-radius: 3px;
+  padding: 28px 30px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 28px 70px rgba(0,0,0,.25);
+}
+.prompt-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+.prompt-sub {
+  font-size: .8rem;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.prompt-section { margin-bottom: 18px; }
+.prompt-label {
+  font-size: .6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.prompt-elev-group {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.prompt-elev {
+  flex: 1; min-width: 70px;
+  background: var(--off-white);
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  padding: 12px;
+  transition: all .14s;
+  letter-spacing: 1px;
+}
+.prompt-elev:hover { border-color: var(--red); color: var(--red); }
+.prompt-elev.on { background: var(--red); border-color: var(--red); color: var(--white); }
+.prompt-price-input {
+  width: 100%;
+  background: var(--off-white);
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
+  color: var(--red);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 12px 14px;
+  text-align: right;
+}
+.prompt-price-input:focus { outline: none; border-color: var(--red); background: var(--white); }
+.prompt-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
+  margin-top: 8px;
+}
+.prompt-btn {
+  border: none; border-radius: 3px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: .8rem; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase;
+  padding: 10px 18px;
+}
+.prompt-btn-red { background: var(--red); color: var(--white); }
+.prompt-btn-red:hover { background: var(--red-dark); }
+.prompt-btn-outline { background: transparent; border: 1.5px solid var(--border2); color: var(--muted); }
+.prompt-btn-outline:hover { border-color: var(--red); color: var(--red); }
+
+/* Header pkg name shows elevation */
+.hdr-pkg-name { display: flex; align-items: center; gap: 6px; }
+.hdr-elev-badge {
+  background: var(--red); color: var(--white);
+  font-family: 'DM Sans', sans-serif; font-size: .58rem;
+  font-weight: 700; letter-spacing: 1.5px;
+  padding: 2px 7px; border-radius: 2px;
+}
 </style>
 </head>
 <body>
@@ -328,6 +553,89 @@ body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: 
   </div>
 </div>
 
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importOverlay">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-title">Import Saved Selection</div>
+      <button class="modal-close" onclick="closeImport()">✕</button>
+    </div>
+    <div class="filter-row">
+      <input class="filter-input" id="filterName" placeholder="Filter by Customer..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterAddress" placeholder="Filter by Address..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterAgent" placeholder="Filter by Agent..." oninput="filterTable()"/>
+      <input class="filter-input" id="filterDate" type="date" oninput="filterTable()" title="Filter by Date"/>
+    </div>
+    <div class="sel-table-wrap">
+      <table class="sel-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Address</th>
+            <th>Agent</th>
+            <th>Date</th>
+            <th>Saved</th>
+          </tr>
+        </thead>
+        <tbody id="importTbody"></tbody>
+      </table>
+    </div>
+    <div class="import-actions">
+      <button class="btn-modal btn-modal-outline" onclick="closeImport()">Cancel</button>
+      <button class="btn-modal btn-modal-red" onclick="confirmImport()">Load Selection</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- GALLERY FLOATING BUTTON -->
+<button class="gallery-btn" onclick="openGallery()">📖 Selection Gallery</button>
+
+<!-- GALLERY BACKDROP + SIDEBAR -->
+<div class="gallery-backdrop" id="galleryBackdrop" onclick="closeGallery()"></div>
+<div class="gallery-panel" id="galleryPanel">
+  <div class="gallery-hdr">
+    <div class="gallery-title">Selection <span>Gallery</span></div>
+    <button class="gallery-close" onclick="closeGallery()" title="Close">✕</button>
+  </div>
+  <div class="gallery-body">
+    <iframe src="gallery.pdf#toolbar=0&view=FitH" title="Selection Gallery"></iframe>
+  </div>
+</div>
+
+<!-- ELEVATION + BASE PRICE PROMPT -->
+<div class="prompt-overlay" id="elevPromptOverlay">
+  <div class="prompt-box">
+    <div class="prompt-title">Package Setup</div>
+    <div class="prompt-sub" id="elevPromptSub">Choose elevation and enter starting price</div>
+
+    <div class="prompt-section">
+      <div class="prompt-label">Elevation</div>
+      <div class="prompt-elev-group">
+        <button class="prompt-elev" data-elev="A" onclick="pickElev('A')">A</button>
+        <button class="prompt-elev" data-elev="B" onclick="pickElev('B')">B</button>
+        <button class="prompt-elev" data-elev="C" onclick="pickElev('C')">C</button>
+        <button class="prompt-elev" data-elev="D" onclick="pickElev('D')">D</button>
+      </div>
+    </div>
+
+    <div class="prompt-section">
+      <div class="prompt-label">Starting Base Price ($)</div>
+      <input class="prompt-price-input" type="number" id="elevPromptPrice" placeholder="0" min="0"/>
+    </div>
+
+    <div class="prompt-actions">
+      <button class="prompt-btn prompt-btn-outline" onclick="cancelElevPrompt()">Cancel</button>
+      <button class="prompt-btn prompt-btn-red" onclick="confirmElevPrompt()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
 <script>
 const SUPABASE_URL = 'https://skbkwjqpbhuuwxpxbmhn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrYmt3anFwYmh1dXd4cHhibWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1OTU2NTUsImV4cCI6MjA5MzE3MTY1NX0.OoWqErkV8ri-F2g1ze0SHvM9DackPYHAD0RCJ65RsQA';
@@ -352,6 +660,10 @@ async function loadPackages() {
   activeSec = visSecs()[0]?.id || null;
   document.getElementById('custDate').value = new Date().toISOString().split('T')[0];
   renderAll();
+  // On initial load, prompt for elevation + base price for the first package
+  if (curPkgId && !pkgElevation[curPkgId]) {
+    setTimeout(() => showElevPrompt(curPkgId), 250);
+  }
 }
 
 function pkg() { return packages.find(p => p.id === curPkgId) || packages[0]; }
@@ -360,18 +672,27 @@ function curSec() { return visSecs().find(s => s.id === activeSec) || visSecs()[
 function getItem(sid, iid) { return visSecs().find(s => s.id === sid)?.items.find(i => i.id === iid); }
 function priceAdj(str) { const m = (str || '').match(/([+-])\$([0-9,]+)/); if (!m) return 0; const n = parseInt(m[2].replace(/,/g, ''), 10); return m[1] === '-' ? -n : n; }
 function fmt(n) { return '$' + (n || 0).toLocaleString(); }
-function calcTotal() { let t = pkg()?.basePrice || 0; const ps = selections[curPkgId] || {}; for (const sec of (pkg()?.sections || [])) { for (const item of (sec.items || [])) { const s = ps[item.id]; if (s?.selected) t += (item.price || 0) + priceAdj(s.selectedOption); } } return t; }
+function calcTotal() { let t = pkgBasePriceSale[curPkgId] || 0; const ps = selections[curPkgId] || {}; for (const sec of (pkg()?.sections || [])) { for (const item of (sec.items || [])) { const s = ps[item.id]; if (s?.selected) t += (item.price || 0) + priceAdj(s.selectedOption); } } return t; }
 function getSel(iid) { return (selections[curPkgId] || {})[iid]; }
 function setSel(iid, data) { if (!selections[curPkgId]) selections[curPkgId] = {}; selections[curPkgId][iid] = data; }
 
-function switchPkg() { curPkgId = document.getElementById('pkgSel').value; activeSec = visSecs()[0]?.id || null; document.getElementById('hdrPkg').textContent = pkg()?.name || '—'; renderAll(); }
+function switchPkg() {
+  const newId = document.getElementById('pkgSel').value;
+  curPkgId = newId;
+  activeSec = visSecs()[0]?.id || null;
+  renderAll();
+  // Prompt for elevation+price if not yet set for this package
+  if (!pkgElevation[newId]) showElevPrompt(newId);
+}
 
 function renderAll() { renderPkgSel(); renderSidebar(); renderMobNav(); renderMain(); updateTotals(); }
 
 function renderPkgSel() {
   const el = document.getElementById('pkgSel');
   el.innerHTML = packages.map(p => `<option value="${p.id}"${p.id === curPkgId ? ' selected' : ''}>${p.name}</option>`).join('');
-  document.getElementById('hdrPkg').textContent = pkg()?.name || '—';
+  const elev = pkgElevation[curPkgId];
+  const hdrEl = document.getElementById('hdrPkg');
+  hdrEl.innerHTML = (pkg()?.name || '—') + (elev ? ' <span class="hdr-elev-badge">ELEV ' + elev + '</span>' : '');
 }
 
 function renderSidebar() {
@@ -440,6 +761,14 @@ function buildCard(secId, item) {
   const optsHtml = item.options.map((o, i) => `<option value="${i}"${selOpt === o ? ' selected' : ''}>${o}</option>`).join('');
   let adjHtml = '<span style="color:var(--muted)">No extra cost</span>';
   if (item.price > 0 || adj !== 0) { const parts = []; if (item.price > 0) parts.push(`+${fmt(item.price)} flat`); if (adj !== 0) parts.push(`<strong>${adj > 0 ? '+' : ''}${fmt(adj)}</strong>`); adjHtml = parts.join(' · '); }
+  const sidingHtml = isSidingItem(item.name) ? `
+    <div class="siding-color-wrap${getSidingColor(item.id).trim() ? ' filled' : ''}" id="sidingwrap_${item.id}" style="${isOn ? '' : 'display:none'}">
+      <div class="siding-color-label">★ Siding Color (Required)</div>
+      <input class="siding-color-input" id="sidingcolor_${item.id}" placeholder="e.g. Sherwin Williams - Naval SW6244"
+        value="${escHtmlSp(getSidingColor(item.id))}"
+        oninput="updateSidingColor('${item.id}', this.value)"/>
+    </div>` : '';
+
   card.innerHTML = `
     <div class="card-top">
       <div class="card-name">${item.name}</div>
@@ -447,11 +776,20 @@ function buildCard(secId, item) {
     </div>
     <div class="opt-lbl">Choose option</div>
     <select class="card-drop" id="drop_${item.id}" onchange="changeOpt('${secId}','${item.id}',this)">${optsHtml}</select>
+    ${sidingHtml}
     <div class="card-foot">
       <div class="card-adj" id="adj_${item.id}">${adjHtml}</div>
       <button class="sel-btn${isOn ? ' on' : ''}" id="btn_${item.id}" onclick="toggleItem('${secId}','${item.id}')">${isOn ? '✓ Selected' : 'Select'}</button>
     </div>`;
   return card;
+}
+
+function escHtmlSp(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function updateSidingColor(itemId, val) {
+  setSidingColor(itemId, val);
+  const wrap = document.getElementById('sidingwrap_' + itemId);
+  if (wrap) wrap.classList.toggle('filled', val.trim().length > 0);
 }
 
 function toggleItem(secId, itemId) {
@@ -463,6 +801,11 @@ function toggleItem(secId, itemId) {
   const card = document.getElementById('card_' + itemId); const btn = document.getElementById('btn_' + itemId);
   if (card) card.className = 'card' + (!isOn ? ' on' : '');
   if (btn) { btn.className = 'sel-btn' + (!isOn ? ' on' : ''); btn.textContent = !isOn ? '✓ Selected' : 'Select'; }
+  // Toggle siding color box visibility
+  if (isSidingItem(item.name)) {
+    const wrap = document.getElementById('sidingwrap_' + itemId);
+    if (wrap) wrap.style.display = !isOn ? '' : 'none';
+  }
   refreshPill(secId, itemId); updateTotals();
 }
 
@@ -511,7 +854,9 @@ function generatePDF() {
   doc.text('BUILDER SELECTIONS REPORT', M + 8, 30);
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(150, 150, 150);
   const p = pkg();
-  doc.text(`Package: ${p.name}  |  Base Price: ${fmt(p.basePrice)}`, M + 8, 47);
+  const saleBase = pkgBasePriceSale[curPkgId] || 0;
+  const elev = pkgElevation[curPkgId] || '—';
+  doc.text(`Package: ${p.name} (Elevation ${elev})  |  Base Price: ${fmt(saleBase)}`, M + 8, 47);
   const cN = document.getElementById('custName').value||'—', cL = document.getElementById('custLot').value||'—', cD = document.getElementById('custDate').value||'—', cA = document.getElementById('custAgent').value||'—';
   doc.text(`Customer: ${cN}  |  Lot / Address: ${cL}  |  Date: ${cD}  |  Agent: ${cA}`, M + 8, 60);
   doc.setTextColor(200, 16, 46); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
@@ -566,6 +911,100 @@ function generatePDF() {
 }
 
 
+
+// ── GALLERY SIDEBAR ──
+function openGallery() {
+  document.getElementById('galleryBackdrop').classList.add('open');
+  document.getElementById('galleryPanel').classList.add('open');
+}
+function closeGallery() {
+  document.getElementById('galleryBackdrop').classList.remove('open');
+  document.getElementById('galleryPanel').classList.remove('open');
+}
+
+// ── ELEVATION + BASE PRICE STATE ──
+let pkgElevation = {}; // { pkgId: 'A' }
+let pkgBasePriceSale = {}; // { pkgId: 12345 }
+let sidingColors = {}; // { pkgId_itemId: 'Sherwin Williams XYZ' }
+let pendingPkgId = null;
+let pendingElevChoice = null;
+
+// ── ELEVATION PROMPT ──
+function showElevPrompt(pkgId) {
+  pendingPkgId = pkgId;
+  pendingElevChoice = pkgElevation[pkgId] || null;
+  const p = packages.find(x => x.id === pkgId);
+  document.getElementById('elevPromptSub').textContent = `Setting up "${p?.name || 'package'}" for this selection`;
+  document.getElementById('elevPromptPrice').value = pkgBasePriceSale[pkgId] || '';
+
+  // Highlight existing choice if any
+  document.querySelectorAll('.prompt-elev').forEach(b => {
+    b.classList.toggle('on', b.dataset.elev === pendingElevChoice);
+  });
+
+  document.getElementById('elevPromptOverlay').classList.add('open');
+}
+
+function pickElev(letter) {
+  pendingElevChoice = letter;
+  document.querySelectorAll('.prompt-elev').forEach(b => {
+    b.classList.toggle('on', b.dataset.elev === letter);
+  });
+}
+
+function cancelElevPrompt() {
+  document.getElementById('elevPromptOverlay').classList.remove('open');
+  // If user cancels and there's no prior setup for this package, fall back to first package
+  if (pendingPkgId && !pkgElevation[pendingPkgId]) {
+    // Reset selector to a package that's already set up, or stay with no setup
+    const firstSetup = packages.find(p => pkgElevation[p.id]);
+    if (firstSetup) {
+      curPkgId = firstSetup.id;
+      document.getElementById('pkgSel').value = curPkgId;
+    }
+  }
+  pendingPkgId = null;
+  pendingElevChoice = null;
+}
+
+function confirmElevPrompt() {
+  if (!pendingElevChoice) { showToast('Please select an elevation.', true); return; }
+  const priceVal = parseFloat(document.getElementById('elevPromptPrice').value);
+  if (isNaN(priceVal) || priceVal < 0) { showToast('Please enter a valid starting price.', true); return; }
+
+  pkgElevation[pendingPkgId] = pendingElevChoice;
+  pkgBasePriceSale[pendingPkgId] = priceVal;
+
+  document.getElementById('elevPromptOverlay').classList.remove('open');
+  pendingPkgId = null;
+  pendingElevChoice = null;
+
+  renderAll();
+}
+
+// ── SIDING COLOR HELPERS ──
+const SIDING_ITEM_NAMES = ['front siding', 'side and rear siding', 'siding gables'];
+function isSidingItem(name) {
+  return SIDING_ITEM_NAMES.includes((name || '').toLowerCase().trim());
+}
+function sidingKey(pkgId, itemId) { return pkgId + '__' + itemId; }
+function getSidingColor(itemId) { return sidingColors[sidingKey(curPkgId, itemId)] || ''; }
+function setSidingColor(itemId, val) { sidingColors[sidingKey(curPkgId, itemId)] = val; }
+
+// Check if all selected siding items have colors filled in
+function getMissingSidingColors() {
+  const ps = selections[curPkgId] || {};
+  const missing = [];
+  visSecs().forEach(sec => {
+    sec.items.forEach(item => {
+      if (isSidingItem(item.name) && ps[item.id]?.selected && !getSidingColor(item.id).trim()) {
+        missing.push(item.name);
+      }
+    });
+  });
+  return missing;
+}
+
 // ── TOAST ──
 function showToast(msg, isErr) {
   const el = document.getElementById('toast');
@@ -586,19 +1025,24 @@ function buildSelectionBlob() {
       .map(i => {
         const s = ps[i.id];
         const adj = priceAdj(s?.selectedOption || '');
-        return {
+        const out = {
           name: i.name,
           selectedOption: s?.selectedOption || '',
           flatPrice: i.price || 0,
           optionPrice: adj,
           total: (i.price || 0) + adj
         };
+        if (isSidingItem(i.name)) {
+          out.sidingColor = getSidingColor(i.id);
+        }
+        return out;
       })
   })).filter(s => s.items.length > 0);
 
   return {
     package_name: p?.name || '',
-    base_price: p?.basePrice || 0,
+    elevation: pkgElevation[curPkgId] || null,
+    base_price: pkgBasePriceSale[curPkgId] || 0,
     total_price: calcTotal(),
     sections: sectionsData
   };
@@ -612,6 +1056,9 @@ async function saveSelection() {
   const cA = document.getElementById('custAgent').value.trim();
 
   if (!cN || !cL) { showToast('Please enter Customer Name and Address before saving.', true); return; }
+  if (!pkgElevation[curPkgId]) { showToast('Please choose an elevation for this package first.', true); return; }
+  const missing = getMissingSidingColors();
+  if (missing.length) { showToast('Please fill in Siding Color for: ' + missing.join(', '), true); return; }
 
   // Check if address already exists
   const { data: existing } = await sb.from('selections').select('id, customer_name, date').eq('address', cL).maybeSingle();
@@ -727,6 +1174,8 @@ function confirmImport() {
   const matchedPkg = packages.find(p => p.name === blob.package_name);
   if (matchedPkg) {
     curPkgId = matchedPkg.id;
+    if (blob.elevation) pkgElevation[curPkgId] = blob.elevation;
+    if (blob.base_price != null) pkgBasePriceSale[curPkgId] = blob.base_price;
     // Rebuild selections from blob
     selections[curPkgId] = {};
     const ps = selections[curPkgId];
@@ -736,6 +1185,7 @@ function confirmImport() {
         const liveItem = liveSec?.items?.find(i => i.name === item.name);
         if (liveItem) {
           ps[liveItem.id] = { selected: true, selectedOption: item.selectedOption };
+          if (item.sidingColor) setSidingColor(liveItem.id, item.sidingColor);
         }
       });
     });
@@ -757,43 +1207,5 @@ async function init() {
 }
 init();
 </script>
-
-<!-- IMPORT MODAL -->
-<div class="modal-overlay" id="importOverlay">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">Import Saved Selection</div>
-      <button class="modal-close" onclick="closeImport()">✕</button>
-    </div>
-    <div class="filter-row">
-      <input class="filter-input" id="filterName" placeholder="Filter by Customer..." oninput="filterTable()"/>
-      <input class="filter-input" id="filterAddress" placeholder="Filter by Address..." oninput="filterTable()"/>
-      <input class="filter-input" id="filterAgent" placeholder="Filter by Agent..." oninput="filterTable()"/>
-      <input class="filter-input" id="filterDate" type="date" oninput="filterTable()" title="Filter by Date"/>
-    </div>
-    <div class="sel-table-wrap">
-      <table class="sel-table">
-        <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Address</th>
-            <th>Agent</th>
-            <th>Date</th>
-            <th>Saved</th>
-          </tr>
-        </thead>
-        <tbody id="importTbody"></tbody>
-      </table>
-    </div>
-    <div class="import-actions">
-      <button class="btn-modal btn-modal-outline" onclick="closeImport()">Cancel</button>
-      <button class="btn-modal btn-modal-red" onclick="confirmImport()">Load Selection</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
 </body>
 </html>
